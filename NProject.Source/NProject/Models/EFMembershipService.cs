@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Security;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
+using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 
 namespace NProject.Models
@@ -203,9 +204,18 @@ namespace NProject.Models
         /// A <see cref="T:System.Web.Security.MembershipUserCollection"/> collection that contains a page of <paramref name="pageSize"/><see cref="T:System.Web.Security.MembershipUser"/> objects beginning at the page specified by <paramref name="pageIndex"/>.
         /// </returns>
         /// <param name="pageIndex">The index of the page of results to return. <paramref name="pageIndex"/> is zero-based.</param><param name="pageSize">The size of the page of results to return.</param><param name="totalRecords">The total number of matched users.</param>
+        [Obsolete("Use GetUsersList instead")]
         public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
         {
             throw new NotImplementedException();
+        }
+
+        public ICollection<User> GetUsersList(int pageIndex, int pageSize, out int totalRecords)
+        {
+            totalRecords = AccessPoint.Users.Count();
+            // becouse on firstpage must be first 20 users and so on..
+            pageIndex = pageIndex - 1;
+            return AccessPoint.Users.OrderBy(u => u.Role.Id).Skip(pageIndex*pageSize).Take(pageSize).ToList();
         }
 
         /// <summary>

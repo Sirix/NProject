@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
+using NProject.Models.Domain;
 
 namespace NProject.Models
 {
@@ -86,20 +87,22 @@ namespace NProject.Models
         bool ValidateUser(string userName, string password);
         MembershipCreateStatus CreateUser(string userName, string password, string email);
         bool ChangePassword(string userName, string oldPassword, string newPassword);
+
+        ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
     }
 
     public class AccountMembershipService : IMembershipService
     {
-        public MembershipProvider _provider { get; set; }
+        public EFMembershipProvider _provider { get; set; }
 
         public AccountMembershipService()
             : this(null)
         {
         }
 
-        public AccountMembershipService(MembershipProvider provider)
+        public AccountMembershipService(EFMembershipProvider provider)
         {
-           _provider = provider ?? Membership.Provider;
+           _provider = provider ?? (EFMembershipProvider)Membership.Provider;
         }
 
         public int MinPasswordLength
@@ -151,6 +154,11 @@ namespace NProject.Models
             {
                 return false;
             }
+        }
+
+        public ICollection<User> GetUsersList(int page, int itemsPerPage, out int total)
+        {
+            return _provider.GetUsersList(page, itemsPerPage, out total);
         }
     }
 

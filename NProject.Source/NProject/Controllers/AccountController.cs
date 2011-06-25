@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
@@ -110,6 +111,19 @@ namespace NProject.Controllers
             // If we got this far, something failed, redisplay form
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
             return View(model);
+        }
+
+        /// <summary>
+        /// Outputs list of all users in system
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles="admin")]
+        public ViewResult List([DefaultValue(1)]int page)
+        {
+            int total;
+            int itemsPerPage = 10;
+            var users = MembershipService.GetUsersList(page, itemsPerPage, out total);
+            return View(users);
         }
 
         // **************************************

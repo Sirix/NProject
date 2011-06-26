@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
@@ -20,13 +21,15 @@ namespace NProject.Models.Infrastructure
                                       Hash = EncryptMD5("director"),
                                       Role = context.Roles.First(r => r.Name == "Director")
                                   });
-            context.Users.Add(new User
-                                  {
-                                      Username = "Manager",
-                                      Email = "manager@nproject.com",
-                                      Hash = EncryptMD5("manager"),
-                                      Role = context.Roles.First(r => r.Name == "PM")
-                                  });
+            var m =
+                new User
+                    {
+                        Username = "Manager",
+                        Email = "manager@nproject.com",
+                        Hash = EncryptMD5("manager"),
+                        Role = context.Roles.First(r => r.Name == "PM")
+                    };
+            context.Users.Add(m);
             context.Users.Add(new User
                                   {
                                       Username = "Customer",
@@ -48,7 +51,8 @@ namespace NProject.Models.Infrastructure
                                          Name = "Develop a project management system",
                                          Customer = context.Users.First(),
                                          CreationDate = DateTime.Now,
-                                         Status = context.ProjectStatuses.First()
+                                         Status = context.ProjectStatuses.First(),
+                                         Team = new List<User> {m}
                                      });
             context.SaveChanges();
         }

@@ -25,20 +25,6 @@ namespace NProject.Controllers
         [Authorize(Roles="PM")]
         public ActionResult AddToProject(int id)
         {
-            //var model = new TaskAddToProjectViewModel();
-            //model.Id = id;
-            //model.ProjectTitle=AccessPoint.Projects.First(p => p.Id == id).Name;
-
-            //model.Statuses=
-            //    AccessPoint.ProjectStatuses.Select(p => new SelectListItem {Text = p.Name, Value = SqlFunctions.StringConvert((double) p.Id)}).
-            //        ToList();
-
-            ////TODO: maybe add filter on users?
-            //model.Users =
-            //    AccessPoint.Users.Where(u => u.Role.Name == "Programmer").Select(
-            //        u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)}).
-            //        ToList();
-
             FillViewAddToProject(id);
 
             return View();
@@ -63,7 +49,6 @@ namespace NProject.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AddToProject(int id, int userId, int statusId, Task t)
-        //public ActionResult AddToProject(TaskAddToProjectViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -71,8 +56,19 @@ namespace NProject.Controllers
                 return View();
             }
             else
-                return RedirectToAction("list", "projects");
+            {
+                var project = AccessPoint.Projects.First(p => p.Id == id);
+                t.Project = project;
+                t.Status = AccessPoint.ProjectStatuses.First(s => s.Id == statusId);
+                t.Responsible = AccessPoint.Users.First(u => u.Id == userId);
+                t.CreationDate = DateTime.Now;
+                project.Tasks.Add(t);
+
+                AccessPoint.SaveChanges();
+                return RedirectToAction("list", "Projects");
+            }
         }
+
         //
         // GET: /Task/
 

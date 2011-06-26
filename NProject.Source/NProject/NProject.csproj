@@ -117,8 +117,8 @@
     <Content Include="Views\Error\Http404.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
+    <Content Include="Views\Projects\ProjectTasks.aspx" />
     <Content Include="Views\Projects\Team.aspx" />
-    <Content Include="Views\Task\2AddToProject.aspx" />
     <Content Include="Views\Task\AddToProject.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>

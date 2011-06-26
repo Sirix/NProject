@@ -43,8 +43,9 @@
             <td>
                 <%:Html.ActionLink("Edit", "Edit", new {/* id=item.PrimaryKey */})%> |
                 <%:Html.ActionLink("Details", "Details", new { id = item.Id })%> |
-                <%:Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})%>
-                <%:Html.ActionLink("View team", "Team", new { id = item.Id })%>
+                <%:Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})%> | 
+                <%:Html.ActionLink("View team", "Team", new { id = item.Id })%> | 
+                <%:Html.ActionLink("View tasks", "Tasks", new { id = item.Id })%>
             </td>
             <td>
                 <%:item.Id%>

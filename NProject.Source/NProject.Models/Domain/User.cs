@@ -11,7 +11,7 @@ namespace NProject.Models.Domain
         [Required]
         public string Hash { get; set; }
         public string Email { get; set; }
-
+        public double HouseRate { get; set; }
         [Required]
         public virtual Role Role { get; set; }
 

@@ -1,0 +1,59 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<IEnumerable<NProject.Models.Domain.Task>>" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
+	ProjectTasks
+</asp:Content>
+
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+
+    <h2>Project tasks</h2>
+
+    <table>
+        <tr>
+            <th></th>
+            <th>
+                Description
+            </th>
+            <th>
+                CreationDate
+            </th>
+            <th>
+                BeginDate
+            </th>
+            <th>
+                EndDate
+            </th>
+        </tr>
+
+    <% foreach (var item in Model) { %>
+    
+        <tr>
+            <td>
+                <%: Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) %> |
+                <%: Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })%> |
+                <%: Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })%>
+            </td>
+            <td>
+                <%: item.Description %>
+            </td>
+            <td>
+                <%: String.Format("{0:g}", item.CreationDate) %>
+            </td>
+            <td>
+                <%: String.Format("{0:g}", item.BeginDate) %>
+            </td>
+            <td>
+                <%: String.Format("{0:g}", item.EndDate) %>
+            </td>
+        </tr>
+    
+    <% } %>
+
+    </table>
+
+    <p>
+        <%: Html.ActionLink("Add new task", "AddToProject", "Task", new { id = ViewData["ProjectId"] }, new object { })%>
+    </p>
+
+</asp:Content>
+

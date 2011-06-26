@@ -38,11 +38,13 @@ namespace NProject.Controllers
         }
 
         //
-        // GET: /Project/Details/5
-        [Authorize]
-        public ActionResult Details(int id)
+        // GET: /Project/Tasks/5
+        [Authorize(Roles="PM")]
+        public ActionResult Tasks(int id)
         {
-            return View();
+            var tasks = AccessPoint.Projects.First(p => p.Id == id).Tasks.ToList();
+            ViewData["ProjectId"] = id;
+            return View("ProjectTasks", tasks);
         }
 
         //
@@ -130,6 +132,7 @@ namespace NProject.Controllers
         /// <returns></returns>
         public ActionResult Team(int id)
         {
+            ViewData["ProjectId"] = id;
             return View(AccessPoint.Projects.First(p => p.Id == id).Team.ToList());
         }
     }

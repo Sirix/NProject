@@ -5,9 +5,10 @@
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-
+    <p>
+        <%: Html.ActionLink("Back to projects list", "list")%>
+    </p>
     <h2>Team</h2>
-
     <table>
         <tr>
             <th>
@@ -40,7 +41,7 @@
     </table>
 
     <p>
-        <%: Html.ActionLink("Create New", "Create") %>
+        <%: Html.ActionLink("Add staff", "AddStaff", new { id = ViewData["ProjectId"] })%>
     </p>
 
 </asp:Content>

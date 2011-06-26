@@ -5,23 +5,36 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
+using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 
 namespace NProject.Controllers
 {
+    [HandleError]
     public class ProjectsController : Controller
     {
         [Dependency]
-        public IAccessPoint db { get; set; }
+        public IAccessPoint AccessPoint { get; set; }
 
         //
         // GET: /Projects/
-        [Authorize]
+        [Authorize(Roles="PM, Director")]
         public ActionResult List()
         {
-            ViewData["User"] = User.Identity.Name;
+            List<Project> projects;
 
-            return View(db.Projects.ToList());
+            if (User.IsInRole("Director"))
+            {
+                projects = AccessPoint.Projects.ToList();
+                ViewData["TableTitle"] = "All company's projects";
+            }
+            else
+            {
+                User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role.Name == "PM");
+                projects = AccessPoint.Projects.ToList().Where(p => p.Team.Contains(manager)).ToList();
+                ViewData["TableTitle"] = "Projects in which you're involved";
+            }
+            return View(projects);
         }
 
         //
@@ -108,6 +121,16 @@ namespace NProject.Controllers
             {
                 return View();
             }
+        }
+
+        /// <summary>
+        /// Outputs team on project with specified id
+        /// </summary>
+        /// <param name="id">Project id</param>
+        /// <returns></returns>
+        public ActionResult Team(int id)
+        {
+            return View(AccessPoint.Projects.First(p => p.Id == id).Team.ToList());
         }
     }
 }

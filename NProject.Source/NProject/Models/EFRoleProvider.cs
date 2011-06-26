@@ -129,7 +129,7 @@ namespace NProject.Models
         /// </returns>
         public override string[] GetAllRoles()
         {
-            throw new NotImplementedException();
+            return _db.Roles.OrderBy(r => r.Id).Select(r => r.Name).ToArray();
         }
 
         /// <summary>

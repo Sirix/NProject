@@ -17,12 +17,14 @@ namespace NProject.Models.Domain
 
         public virtual ICollection<Task> Tasks { get; set; }
         public virtual User Customer { get; set; }
+        public virtual ICollection<User> Team { get; set; }
         public virtual ProjectStatus Status { get; set; }
 
         public Project()
         {
 // ReSharper disable DoNotCallOverridableMethodsInConstructor
             Tasks = new List<Task>();
+            Team = new List<User>();
 // ReSharper restore DoNotCallOverridableMethodsInConstructor
 
         }

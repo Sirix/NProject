@@ -23,7 +23,13 @@ namespace NProject
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute(null, "projects/", new { controller = "Projects", action = "List" });
+            //routes.MapRoute(null,
+            //                "Account/Edit/{userId}", // Matches ~/user/32 but not ~/user/dsfdf
+            //                new {controller = "Account", action = "Edit"},
+            //                new { userId = @"\d+" } // Constraints: page must be numerical
+            //    );
+
+           // routes.MapRoute(null, "projects/", new { controller = "Projects", action = "List" });
 
             routes.MapRoute(
                 "Default", // Route name

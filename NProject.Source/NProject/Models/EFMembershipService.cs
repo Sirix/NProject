@@ -376,5 +376,10 @@ namespace NProject.Models
         }
 
         #endregion
+
+        internal User GetUserById(int userId)
+        {
+            return AccessPoint.Users.First(u => u.Id == userId);
+        }
     }
 }

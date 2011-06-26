@@ -56,7 +56,7 @@ namespace NProject.Models.Infrastructure
         private static void SeedNeededToLaunchData(T context)
         {
             var roleAdmin =
-                new Role {Name = "Admin", Description = "get fully privilegies on user controlling"}.AsBase();
+                new Role {Name = "Admin", Description = "get fully privilegies on user controlling", BaseLocation="account/list"}.AsBase();
 
             context.Roles.Add(roleAdmin);
             context.Roles.Add(new Role { Name = "PM", Description = "Project manager" }.AsBase());

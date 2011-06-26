@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
@@ -10,6 +11,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
 using NProject.Models;
+using NProject.Models.Infrastructure;
 
 namespace NProject.Controllers
 {
@@ -20,6 +22,9 @@ namespace NProject.Controllers
 
         [Dependency]
         public IMembershipService MembershipService { get; set; }
+
+        [Dependency]
+        public IAccessPoint AccessPoint { get; set; }
 
         protected override void Initialize(RequestContext requestContext)
         {
@@ -34,6 +39,9 @@ namespace NProject.Controllers
 
         public ActionResult LogOn()
         {
+            if(Request.IsAuthenticated)
+                return RedirectToAction("index", "home");
+
             return View();
         }
 
@@ -51,11 +59,7 @@ namespace NProject.Controllers
                     }
                     else
                     {
-                        //becouse we support only one role to one user
-                        string role = Roles.Provider.GetRolesForUser(model.UserName)[0];
-                        var redirectData = ((IRedirectByRole)Roles.Provider).GetBaseLocationForRole(role);
-
-                        return RedirectToRoute(new { controller = redirectData[0], action = redirectData[1] });
+                        return RedirectToAction("index", "home");
                     }
                 }
                 else
@@ -167,5 +171,53 @@ namespace NProject.Controllers
             return View();
         }
 
+
+        [Authorize(Roles = "admin")]
+        public ActionResult Edit(int id)
+        {
+            if (id <= 0)
+            {
+                ModelState.AddModelError("", "Incorrect user id");
+                return View("List");
+            }
+            else
+            {
+                var roles = Roles.Provider.GetAllRoles().Select(r => new SelectListItem {Text = r, Value = r}).ToList();
+                var user = MembershipService.GetUserById(id);
+                roles.First(r => r.Text == user.Role.Name).Selected = true;
+                ViewData["Roles"] = roles;
+                return View(user);
+            }
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(EditAccountModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if(MembershipService.UpdateUser(model))
+                {
+                    return RedirectToAction("ChangePasswordSuccess");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
+                }
+            }
+
+            // If we got this far, something failed, redisplay form
+            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            return View(model);
+        }
+    }
+    public class EditAccountModel
+    {
+        public string Username { get; set; }
+
+        public string Email { get; set; }
+
+        public string RoleName { get; set; }
     }
 }

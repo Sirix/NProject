@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
     <Compile Include="Global.asax.cs">
@@ -108,9 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Views\Account\Edit.aspx" />
     <Content Include="Views\Account\List.aspx" />
+    <Content Include="Views\Error\Http404.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
+    <Content Include="Views\Projects\Team.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
 using NProject.Models.Domain;
+using NProject.Models.Infrastructure;
 
 namespace NProject.Models
 {
@@ -89,11 +90,17 @@ namespace NProject.Models
         bool ChangePassword(string userName, string oldPassword, string newPassword);
 
         ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
+        User GetUserById(int userId);
+
+        bool UpdateUser(Controllers.EditAccountModel model);
     }
 
     public class AccountMembershipService : IMembershipService
     {
         public EFMembershipProvider _provider { get; set; }
+
+        [Dependency]
+        public IAccessPoint AccessPoint { get; set; }
 
         public AccountMembershipService()
             : this(null)
@@ -159,6 +166,22 @@ namespace NProject.Models
         public ICollection<User> GetUsersList(int page, int itemsPerPage, out int total)
         {
             return _provider.GetUsersList(page, itemsPerPage, out total);
+        }
+
+
+        public User GetUserById(int userId)
+        {
+            return _provider.GetUserById(userId);
+        }
+
+
+        public bool UpdateUser(Controllers.EditAccountModel model)
+        {
+            var user = AccessPoint.Users.First(u => u.Username == model.Username);
+            user.Email = model.Email;
+            user.Role = AccessPoint.Roles.First(r => r.Name == model.RoleName);
+            AccessPoint.SaveChanges();
+            return true;
         }
     }
 

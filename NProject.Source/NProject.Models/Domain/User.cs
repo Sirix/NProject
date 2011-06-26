@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace NProject.Models.Domain
 {
@@ -13,5 +14,7 @@ namespace NProject.Models.Domain
 
         [Required]
         public virtual Role Role { get; set; }
+
+        public virtual ICollection<Project> Projects { get; set; }
     }
 }

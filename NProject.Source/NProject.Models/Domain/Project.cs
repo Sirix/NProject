@@ -18,6 +18,7 @@ namespace NProject.Models.Domain
         public virtual ICollection<Task> Tasks { get; set; }
         public virtual User Customer { get; set; }
         public virtual ICollection<User> Team { get; set; }
+        [Required]
         public virtual ProjectStatus Status { get; set; }
 
         public Project()

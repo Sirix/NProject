@@ -16,7 +16,6 @@ namespace NProject.Controllers
             var redirectData = ((IRedirectByRole)Roles.Provider).GetBaseLocationForRole(role);
 
             return RedirectToAction(redirectData[1], redirectData[0]);
-
         }
 
         public ActionResult About()

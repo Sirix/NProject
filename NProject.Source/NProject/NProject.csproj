@@ -115,6 +115,7 @@
     <Content Include="Views\Account\Edit.aspx" />
     <Content Include="Views\Account\List.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
+    <Content Include="Views\Projects\AddStaff.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
     <Content Include="Views\Projects\ProjectTasks.aspx" />

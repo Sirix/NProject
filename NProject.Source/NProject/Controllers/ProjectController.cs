@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Objects.SqlClient;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -39,13 +40,43 @@ namespace NProject.Controllers
 
         //
         // GET: /Project/Tasks/5
-        [Authorize(Roles="PM")]
+        [Authorize(Roles = "PM, Director")]
         public ActionResult Tasks(int id)
         {
             var tasks = AccessPoint.Projects.First(p => p.Id == id).Tasks.ToList();
             ViewData["ProjectId"] = id;
             return View("ProjectTasks", tasks);
         }
+
+        /// <summary>
+        /// Output form for add staff to project team
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "PM")]
+        public ActionResult AddStaff(int id)
+        {
+            ViewData["ProjectId"] = id;
+            ViewData["ProjectTitle"] = AccessPoint.Projects.First(p => p.Id == id).Name;
+
+            //get free programmers
+            ViewData["Users"] =
+                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.Projects.Count == 0).Select(
+                    u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
+            return View();
+        }
+
+        [Authorize(Roles = "PM")]
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public ActionResult AddStaff(int id, int userId)
+        {
+            AccessPoint.Projects.First(p => p.Id == id).Team.Add(AccessPoint.Users.First(u => u.Id == userId));
+            AccessPoint.SaveChanges();
+
+            return RedirectToAction("Team", new {id = id});
+        }
+
 
         //
         // GET: /Project/Create
@@ -130,6 +161,7 @@ namespace NProject.Controllers
         /// </summary>
         /// <param name="id">Project id</param>
         /// <returns></returns>
+        [Authorize(Roles="PM, Director")]
         public ActionResult Team(int id)
         {
             ViewData["ProjectId"] = id;

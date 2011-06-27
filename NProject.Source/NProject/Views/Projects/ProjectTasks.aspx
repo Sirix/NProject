@@ -23,6 +23,9 @@
             <th>
                 EndDate
             </th>
+            <th>
+                Responsible
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
@@ -44,6 +47,9 @@
             </td>
             <td>
                 <%: String.Format("{0:g}", item.EndDate) %>
+            </td>
+            <td>
+                <%: item.Responsible.Username %>
             </td>
         </tr>
     

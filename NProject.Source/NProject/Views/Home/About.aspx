@@ -5,5 +5,5 @@
 </asp:Content>
 
 <asp:Content ID="aboutContent" ContentPlaceHolderID="MainContent" runat="server">
-    <h2>About some our projects</h2>
+    <h2>About NProject</h2>
 </asp:Content>

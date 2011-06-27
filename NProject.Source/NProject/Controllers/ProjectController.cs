@@ -81,6 +81,7 @@ namespace NProject.Controllers
         //
         // GET: /Project/Create
 
+        [Authorize(Roles = "Director")]
         public ActionResult Create()
         {
             return View();
@@ -90,6 +91,7 @@ namespace NProject.Controllers
         // POST: /Project/Create
 
         [HttpPost]
+        [Authorize(Roles = "Director")]
         public ActionResult Create(FormCollection collection)
         {
             try

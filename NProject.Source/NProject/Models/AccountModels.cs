@@ -92,7 +92,7 @@ namespace NProject.Models
         ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
         User GetUserById(int userId);
 
-        bool UpdateUser(Controllers.EditAccountModel model);
+        bool UpdateUserRole(int id, int roleId);
     }
 
     public class AccountMembershipService : IMembershipService
@@ -174,13 +174,21 @@ namespace NProject.Models
             return _provider.GetUserById(userId);
         }
 
-
-        public bool UpdateUser(Controllers.EditAccountModel model)
+        public bool UpdateUserRole(int id, int roleId)
         {
-            var user = AccessPoint.Users.First(u => u.Username == model.Username);
-            user.Email = model.Email;
-            user.Role = AccessPoint.Roles.First(r => r.Name == model.RoleName);
+            var user = AccessPoint.Users.First(u => u.Id == id);
+            var role = AccessPoint.Roles.First(r => r.Id == roleId);
+
+            int currentUserRoleId = user.Role.Id;
+
+            //only one user remains with this role
+            if (AccessPoint.Users.Count(u => u.Role.Id == currentUserRoleId) == 1)
+            {
+                return false;
+            }
+            user.Role = role;
             AccessPoint.SaveChanges();
+
             return true;
         }
     }

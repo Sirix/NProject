@@ -6,44 +6,20 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Change user information</h2>
+    <h2>Manage role <%: ViewData["Username"] %></h2>
 
     <% using (Html.BeginForm()) {%>
     <%: Html.AntiForgeryToken() %>
         <%: Html.ValidationSummary(true) %>
         
         <fieldset>
-            <legend>Fields</legend>
+            <legend>Set role</legend>
             
-            <div class="editor-label">
-                <%: Html.LabelFor(model => model.Username) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Username, new {disabled=true}) %>
-                <%: Html.ValidationMessageFor(model => model.Username) %>
-            </div>
-            
-            <div class="editor-label">
-                <%: Html.LabelFor(model => model.Hash) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Hash) %>
-                <%: Html.ValidationMessageFor(model => model.Hash) %>
-            </div>
-            
-            <div class="editor-label">
-                <%: Html.LabelFor(model => model.Email) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Email) %>
-                <%: Html.ValidationMessageFor(model => model.Email) %>
-            </div>
-
             <div class="editor-label">
                 <%: Html.LabelFor(model => model.Role) %>
             </div>
             <div class="editor-field">
-                <%: Html.DropDownList("RoleName", (List<SelectListItem>)ViewData["Roles"])%>
+                <%: Html.DropDownList("roleId", (List<SelectListItem>)ViewData["Roles"])%>
                 <%: Html.ValidationMessageFor(model => model.Role) %>
             </div>
             <p>

@@ -14,6 +14,7 @@ namespace NProject.Models.Infrastructure
 
         int SaveChanges();
     }
+
     public class DbAccessPoint : DbContext, IAccessPoint
     {
         public IDbSet<Project> Projects { get; set; }

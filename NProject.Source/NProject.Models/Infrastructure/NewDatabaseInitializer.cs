@@ -4,13 +4,14 @@ using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Devtalk.EF.CodeFirst;
 using NProject.Models.Domain;
 
 namespace NProject.Models.Infrastructure
 {
-    class NewDatabaseInitializer<T> : DropCreateDatabaseIfModelChanges<T> where T : DbContext, IAccessPoint
+    class NewDatabaseInitializer<T> : DontDropDbJustCreateTablesIfModelChanged<T> where T : DbContext, IAccessPoint
     {
-        protected override void Seed(T context)
+        protected void Seed(T context)
         {
             SeedNeededToLaunchData(context);
 

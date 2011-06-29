@@ -11,7 +11,13 @@ namespace NProject.Models.Infrastructure
 {
     class NewDatabaseInitializer<T> : DontDropDbJustCreateTablesIfModelChanged<T> where T : DbContext, IAccessPoint
     {
-        protected void Seed(T context)
+        public new void InitializeDatabase(T context)
+        {
+            base.InitializeDatabase(context);
+            this.Seed(context);
+        }
+
+        internal void Seed(T context)
         {
             SeedNeededToLaunchData(context);
 
@@ -65,7 +71,7 @@ namespace NProject.Models.Infrastructure
             context.SaveChanges();
         }
 
-        private static void SeedNeededToLaunchData(T context)
+        internal void SeedNeededToLaunchData(T context)
         {
             var roleAdmin =
                 new Role {Name = "Admin", Description = "get fully privilegies on user controlling", BaseLocation="account/list"}.AsBase();

@@ -46,6 +46,13 @@ namespace NProject.Models.Infrastructure
                                       Role = context.Roles.First(r => r.Name == "Programmer")
                                   });
 
+            context.Users.Add(new User
+                                  {
+                                      Username = "Programmer2",
+                                      Email = "programmer2@nproject.com",
+                                      Hash = EncryptMD5("programmer2"),
+                                      Role = context.Roles.First(r => r.Name == "Programmer")
+                                  });
 
             context.Projects.Add(new Project
                                      {

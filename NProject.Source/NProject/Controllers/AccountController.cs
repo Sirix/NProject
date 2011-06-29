@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Objects.SqlClient;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Principal;
@@ -87,23 +88,30 @@ namespace NProject.Controllers
         // URL: /Account/Register
         // **************************************
 
+        [Authorize(Roles = "admin")]
         public ActionResult Register()
         {
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            var roles =
+                AccessPoint.Roles.Select(
+                    r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).
+                    ToList();
+            ViewData["Roles"] = roles;
+
             return View();
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public ActionResult Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
                 // Attempt to register the user
-                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email);
+                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email, model.RoleId);
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
-                    FormsService.SignIn(model.UserName, false /* createPersistentCookie */);
                     return RedirectToAction("Index", "Home");
                 }
                 else
@@ -113,7 +121,13 @@ namespace NProject.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            var roles =
+                AccessPoint.Roles.Select(
+                    r => new SelectListItem { Text = r.Name, Value = SqlFunctions.StringConvert((double)r.Id) }).
+                    ToList();
+            ViewData["Roles"] = roles;
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+
             return View(model);
         }
 
@@ -182,10 +196,15 @@ namespace NProject.Controllers
             }
             else
             {
-                var roles = Roles.Provider.GetAllRoles().Select(r => new SelectListItem {Text = r, Value = r}).ToList();
+                var roles =
+                    AccessPoint.Roles.Select(
+                        r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).
+                        ToList();
                 var user = MembershipService.GetUserById(id);
                 roles.First(r => r.Text == user.Role.Name).Selected = true;
                 ViewData["Roles"] = roles;
+                ViewData["Username"] = user.Username;
+
                 return View(user);
             }
         }
@@ -193,31 +212,27 @@ namespace NProject.Controllers
         [Authorize(Roles = "admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(EditAccountModel model)
+        public ActionResult Edit(int id, int roleId)
         {
             if (ModelState.IsValid)
             {
-                if(MembershipService.UpdateUser(model))
+                if(MembershipService.UpdateUserRole(id, roleId))
                 {
-                    return RedirectToAction("ChangePasswordSuccess");
+                    return RedirectToAction("List", "Account");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "The current password is incorrect or the new password is invalid.");
+                    ModelState.AddModelError("", "Incorrect role update");
                 }
             }
-
-            // If we got this far, something failed, redisplay form
-            ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
-            return View(model);
+            var roles =
+                AccessPoint.Roles.Select(
+                    r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).ToList();
+            var user = MembershipService.GetUserById(id);
+            roles.First(r => r.Text == user.Role.Name).Selected = true;
+            ViewData["Roles"] = roles;
+            ViewData["Username"] = user.Username;
+            return View();
         }
-    }
-    public class EditAccountModel
-    {
-        public string Username { get; set; }
-
-        public string Email { get; set; }
-
-        public string RoleName { get; set; }
     }
 }

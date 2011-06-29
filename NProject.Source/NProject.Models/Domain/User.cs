@@ -12,7 +12,7 @@ namespace NProject.Models.Domain
         public string Hash { get; set; }
         public string Email { get; set; }
         public double HouseRate { get; set; }
-        [Required]
+
         public virtual Role Role { get; set; }
 
         public virtual ICollection<Project> Projects { get; set; }

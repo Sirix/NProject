@@ -34,7 +34,13 @@
                     <%: Html.TextBoxFor(m => m.Email) %>
                     <%: Html.ValidationMessageFor(m => m.Email) %>
                 </div>
-                
+                 <div class="editor-label">
+                <%: Html.LabelFor(model => model.RoleId) %>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownList("roleId", (List<SelectListItem>)ViewData["Roles"])%>
+                <%: Html.ValidationMessageFor(model => model.RoleId) %>
+            </div>
                 <div class="editor-label">
                     <%: Html.LabelFor(m => m.Password) %>
                 </div>

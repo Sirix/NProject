@@ -88,10 +88,16 @@ namespace NProject.Controllers
         // URL: /Account/Register
         // **************************************
 
-        [Authorize(Roles="admin")]
+        [Authorize(Roles = "admin")]
         public ActionResult Register()
         {
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+            var roles =
+                AccessPoint.Roles.Select(
+                    r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).
+                    ToList();
+            ViewData["Roles"] = roles;
+
             return View();
         }
 
@@ -102,7 +108,7 @@ namespace NProject.Controllers
             if (ModelState.IsValid)
             {
                 // Attempt to register the user
-                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email);
+                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email, model.RoleId);
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
@@ -115,7 +121,13 @@ namespace NProject.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            var roles =
+                AccessPoint.Roles.Select(
+                    r => new SelectListItem { Text = r.Name, Value = SqlFunctions.StringConvert((double)r.Id) }).
+                    ToList();
+            ViewData["Roles"] = roles;
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
+
             return View(model);
         }
 

@@ -63,7 +63,15 @@ namespace NProject.Models
         /// <param name="username">The user name for the new user. </param><param name="password">The password for the new user. </param><param name="email">The e-mail address for the new user.</param><param name="passwordQuestion">The password question for the new user.</param><param name="passwordAnswer">The password answer for the new user</param><param name="isApproved">Whether or not the new user is approved to be validated.</param><param name="providerUserKey">The unique identifier from the membership data source for the user.</param><param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"/> enumeration value indicating whether the user was created successfully.</param>
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            throw new NotImplementedException();
+            if (AccessPoint.Users.Any(u => u.Username == username))
+            {
+                status = MembershipCreateStatus.DuplicateUserName;
+                return null;
+            }
+            AccessPoint.Users.Add(new User {Username = username, Email = email, Hash = MD5.EncryptMD5(password)});
+            AccessPoint.SaveChanges();
+            status = MembershipCreateStatus.Success;
+            return null;
         }
 
         /// <summary>

@@ -13,7 +13,6 @@ using NProject.Models.Infrastructure;
 
 namespace NProject.Models
 {
-
     #region Models
     [PropertiesMustMatch("NewPassword", "ConfirmPassword", ErrorMessage = "The new password and confirmation password do not match.")]
     public class ChangePasswordModel
@@ -72,6 +71,10 @@ namespace NProject.Models
         [DataType(DataType.Password)]
         [DisplayName("Confirm password")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [DisplayName("Role")]
+        public int RoleId { get; set; }
     }
     #endregion
 
@@ -86,7 +89,7 @@ namespace NProject.Models
         int MinPasswordLength { get; }
 
         bool ValidateUser(string userName, string password);
-        MembershipCreateStatus CreateUser(string userName, string password, string email);
+        MembershipCreateStatus CreateUser(string userName, string password, string email, int roleId);
         bool ChangePassword(string userName, string oldPassword, string newPassword);
 
         ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
@@ -129,14 +132,23 @@ namespace NProject.Models
             return _provider.ValidateUser(userName, password);
         }
 
-        public MembershipCreateStatus CreateUser(string userName, string password, string email)
+        public MembershipCreateStatus CreateUser(string userName, string password, string email, int roleId)
         {
             if (String.IsNullOrEmpty(userName)) throw new ArgumentException("Value cannot be null or empty.", "userName");
             if (String.IsNullOrEmpty(password)) throw new ArgumentException("Value cannot be null or empty.", "password");
             if (String.IsNullOrEmpty(email)) throw new ArgumentException("Value cannot be null or empty.", "email");
+            if (roleId <= 0) throw new ArgumentException("Role identificator must be greater than zero.", "roleId");
 
+            //create user
             MembershipCreateStatus status;
             _provider.CreateUser(userName, password, email, null, null, true, null, out status);
+            if (status != MembershipCreateStatus.Success) return status;
+
+            //set role
+            var user = AccessPoint.Users.First(u => u.Username == userName);
+            user.Role = AccessPoint.Roles.First(r => r.Id == roleId);
+            AccessPoint.SaveChanges();
+
             return status;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Objects.SqlClient;
 using System.Linq;
@@ -19,29 +20,34 @@ namespace NProject.Controllers
 
         //
         // GET: /Projects/
-        [Authorize(Roles="PM, Director, Customer")]
+        [Authorize(Roles = "PM, Director, Customer")]
         public ActionResult List()
         {
-            List<Project> projects;
+            var projects = Enumerable.Empty<Project>();
 
-            if (User.IsInRole("Director"))
-            {
-                projects = AccessPoint.Projects.ToList();
-                ViewData["TableTitle"] = "All company's projects";
-            }
-            else if (User.IsInRole("Customer"))
-            {
-                var customer = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            string role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
+            ViewData["Role"] = role;
 
-                projects = AccessPoint.Projects.Where(p => p.Customer.Id == customer.Id).ToList();
-                ViewData["TableTitle"] = "All your projects";
-            }
-            else
+            switch (role)
             {
-                User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role.Name == "PM");
-                projects = AccessPoint.Projects.ToList().Where(p => p.Team.Contains(manager)).ToList();
-                ViewData["TableTitle"] = "Projects in which you're involved";
+                case "Director":
+                    projects = AccessPoint.Projects.ToList();
+                    ViewData["TableTitle"] = "All company's projects";
+                    break;
+
+                case "Customer":
+                    var customer = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+                    projects = AccessPoint.Projects.Where(p => p.Customer.Id == customer.Id).ToList();
+                    ViewData["TableTitle"] = "All your projects";
+                    break;
+
+                case "PM":
+                    User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role.Name == "PM");
+                    projects = AccessPoint.Projects.ToList().Where(p => p.Team.Contains(manager)).ToList();
+                    ViewData["TableTitle"] = "Projects in which you're involved";
+                    break;
             }
+            
             return View(projects);
         }
 

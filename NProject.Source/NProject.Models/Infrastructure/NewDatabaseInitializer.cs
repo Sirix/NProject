@@ -56,7 +56,7 @@ namespace NProject.Models.Infrastructure
             context.Projects.Add(new Project
                                      {
                                          Name = "Develop a project management system",
-                                         Customer = context.Users.First(),
+                                         Customer = context.Users.First(u => u.Username == "Customer"),
                                          CreationDate = DateTime.Now,
                                          Status = context.ProjectStatuses.First(),
                                          Team = new List<User> {m}

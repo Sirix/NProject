@@ -19,7 +19,7 @@ namespace NProject.Controllers
 
         //
         // GET: /Projects/
-        [Authorize(Roles="PM, Director")]
+        [Authorize(Roles="PM, Director, Customer")]
         public ActionResult List()
         {
             List<Project> projects;
@@ -28,6 +28,13 @@ namespace NProject.Controllers
             {
                 projects = AccessPoint.Projects.ToList();
                 ViewData["TableTitle"] = "All company's projects";
+            }
+            else if (User.IsInRole("Customer"))
+            {
+                var customer = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+
+                projects = AccessPoint.Projects.Where(p => p.Customer.Id == customer.Id).ToList();
+                ViewData["TableTitle"] = "All your projects";
             }
             else
             {

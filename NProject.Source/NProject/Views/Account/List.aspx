@@ -6,14 +6,11 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>List</h2>
+    <h2>User's list</h2>
 
     <table>
         <tr>
             <th></th>
-            <th>
-                Id
-            </th>
             <th>
                 Username
             </th>
@@ -31,9 +28,6 @@
             <td>
                 <%: Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) %> |
                 <%: Html.ActionLink("Delete", "Delete", new { id = item.Id })%>
-            </td>
-            <td>
-                <%: item.Id %>
             </td>
             <td>
                 <%: item.Username %>

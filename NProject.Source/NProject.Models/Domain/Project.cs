@@ -12,13 +12,14 @@ namespace NProject.Models.Domain
         [Column(TypeName="money")]
         public decimal TotalCost { get; set; }
         public int Progress { get; set; }
+        public double PriceDiscount { get; set; }
         public DateTime CreationDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public DateTime? DeliveryDate { get; set; }
 
         public virtual ICollection<Task> Tasks { get; set; }
         public virtual User Customer { get; set; }
         public virtual ICollection<User> Team { get; set; }
-        [Required]
         public virtual ProjectStatus Status { get; set; }
 
         public Project()
@@ -26,6 +27,7 @@ namespace NProject.Models.Domain
 // ReSharper disable DoNotCallOverridableMethodsInConstructor
             Tasks = new List<Task>();
             Team = new List<User>();
+            CreationDate = DateTime.Now;
 // ReSharper restore DoNotCallOverridableMethodsInConstructor
 
         }

@@ -166,7 +166,8 @@ namespace NProject.Models
         /// <returns>Array, first element is name of controller, second - action name</returns>
         public string[] GetBaseLocationForRole(string roleName)
         {
-            string location = _db.Roles.First(r => r.Name == roleName).BaseLocation ?? "projects/list";
+            var role = _db.Roles.First(r => r.Name == roleName);
+            string location = role.BaseLocation ?? "projects/list";
             return location.Split(new[] {'/'});
         }
     }

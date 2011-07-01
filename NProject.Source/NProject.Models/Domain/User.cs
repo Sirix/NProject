@@ -8,13 +8,12 @@ namespace NProject.Models.Domain
         public int Id { get; set; }
         [Required]
         public string Username { get; set; }
-        [Required]
         public string Hash { get; set; }
+        [Required]
         public string Email { get; set; }
         public double HouseRate { get; set; }
 
         public virtual Role Role { get; set; }
-
         public virtual ICollection<Project> Projects { get; set; }
     }
 }

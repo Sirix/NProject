@@ -32,9 +32,9 @@
     
         <tr>
             <td>
-                <%: Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) %> |
-                <%: Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })%> |
-                <%: Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })%>
+                <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %> |
+                <%: Html.ActionLink("Details", "Details", "Task",new {  id=item.Id }, new object()) %> |
+                <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %> |
             </td>
             <td>
                 <%: item.Description %>

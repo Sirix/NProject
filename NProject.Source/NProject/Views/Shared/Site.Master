@@ -35,6 +35,16 @@
         </div>
 
         <div id="main">
+        <% if (TempData.ContainsKey("ErrorMessage")) {  %>
+        <div class="message-error">
+        <%: TempData["ErrorMessage"] %>
+        </div>
+        <%} %>
+        <% if (TempData.ContainsKey("InformMessage")) {  %>
+        <div class="message-inform">
+        <%: TempData["InformMessage"]%>
+        </div>
+        <%} %>
             <asp:ContentPlaceHolder ID="MainContent" runat="server" />
 
             <div id="footer">

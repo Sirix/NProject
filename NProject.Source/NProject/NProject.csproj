@@ -101,8 +101,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\MenuHelper.cs" />
     <Compile Include="Infrastructure\Md5Helper.cs" />
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\ProjectListViewModel.cs" />
     <Compile Include="Models\TaskAddToProjectViewModel.cs" />
     <Compile Include="Models\EFMembershipService.cs" />
     <Compile Include="Models\EFRoleProvider.cs" />
@@ -116,6 +118,8 @@
     <Content Include="Views\Account\List.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
     <Content Include="Views\Projects\AddStaff.aspx" />
+    <Content Include="Views\Projects\Create.aspx" />
+    <Content Include="Views\Projects\Delete.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
     <Content Include="Views\Projects\ProjectTasks.aspx" />

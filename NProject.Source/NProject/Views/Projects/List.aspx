@@ -1,13 +1,13 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<IEnumerable<NProject.Models.Domain.Project>>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.ProjectListViewModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-	List
+	<%: Model.TableTitle %>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2><%: ViewData["TableTitle"] %></h2>
-    <% if (Model.Count() > 0)
+    <h2><%: Model.TableTitle %></h2>
+    <% if (Model.Projects.Count() > 0)
        {%>
     <table>
         <tr>
@@ -33,20 +33,25 @@
         </tr>
 
     <%
-           foreach (var item in Model)
+           foreach (var item in Model.Projects)
            {%>
     
         <tr>
             <td>
+                <%:Html.ActionLink("Details", "Details", new { id = item.Id })%> | 
                 <%:Html.ActionLink("Edit", "Edit", new {/* id=item.PrimaryKey */})%> |
-                <%:Html.ActionLink("Details", "Details", new { id = item.Id })%> |
-                <%:Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})%> | 
-                <% if (ViewData["Role"].ToString() != "Customer")
+                <% if (!Model.UserIsCustomer)
 {%>
                 <%:Html.ActionLink("View team", "Team", new {id = item.Id})%> | 
                 <%:Html.ActionLink("View tasks", "Tasks", new {id = item.Id})%>
                 <%
+}%>                <% if (Model.UserCanManageMeetings) { %> 
+                 | <%:Html.ActionLink("Meetings", "List", "Meetings", new {id = item.Id}, new object{})%>
+                <%
 }%>
+                <% if (Model.UserCanCreateAndDeleteProject) { %>  
+                  | <%:Html.ActionLink("Delete", "Delete", new { id=item.Id})%>
+                <%  }%>
             </td>
             <td>
                 <%:item.Name%>
@@ -78,6 +83,10 @@
        <%
        }%>
     </table>
-
+    <% if (Model.UserCanCreateAndDeleteProject)
+       {%>
+     <%:Html.ActionLink("Create new project", "Create")%>
+     <%
+       }%>
 </asp:Content>
 

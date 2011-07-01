@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Data.Objects.SqlClient;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
+using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 
@@ -23,32 +21,35 @@ namespace NProject.Controllers
         [Authorize(Roles = "PM, Director, Customer")]
         public ActionResult List()
         {
+            var model = new ProjectListViewModel();
             var projects = Enumerable.Empty<Project>();
-
-            string role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
-            ViewData["Role"] = role;
+            var role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
 
             switch (role)
             {
                 case "Director":
                     projects = AccessPoint.Projects.ToList();
-                    ViewData["TableTitle"] = "All company's projects";
+                    model.TableTitle = "All company's projects";
                     break;
 
                 case "Customer":
                     var customer = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
                     projects = AccessPoint.Projects.Where(p => p.Customer.Id == customer.Id).ToList();
-                    ViewData["TableTitle"] = "All your projects";
+                    model.TableTitle = "All your projects";
                     break;
 
                 case "PM":
                     User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role.Name == "PM");
                     projects = AccessPoint.Projects.ToList().Where(p => p.Team.Contains(manager)).ToList();
-                    ViewData["TableTitle"] = "Projects in which you're involved";
+                    model.TableTitle = "Projects in which you're involved";
                     break;
             }
-            
-            return View(projects);
+            model.Projects = projects;
+            model.UserCanCreateAndDeleteProject = role == "Director";
+            model.UserIsCustomer = role == "Customer";
+            model.UserCanManageMeetings = role == "PM";
+
+            return View(model);
         }
 
         //
@@ -56,11 +57,27 @@ namespace NProject.Controllers
         [Authorize(Roles = "PM, Director")]
         public ActionResult Tasks(int id)
         {
-            var tasks = AccessPoint.Projects.First(p => p.Id == id).Tasks.ToList();
+            var project = GetProjectById(id);
+            ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
+
+            var tasks = project.Tasks.ToList();
             ViewData["ProjectId"] = id;
             return View("ProjectTasks", tasks);
         }
 
+        private void ValidateAccessToProject(Project project, string role, string errorMessage)
+        {
+            var user = AccessPoint.Users.First(i => i.Username == User.Identity.Name);
+            if (!project.Team.Contains(user) && user.Role.Name == role)
+            {
+                TempData["ErrorMessage"] = errorMessage;
+                RedirectToAction("List").ExecuteResult(ControllerContext);
+            }
+        }
+        private Project GetProjectById(int id)
+        {
+            return AccessPoint.Projects.First(p => p.Id == id);
+        }
         /// <summary>
         /// Output form for add staff to project team
         /// </summary>
@@ -70,11 +87,13 @@ namespace NProject.Controllers
         public ActionResult AddStaff(int id)
         {
             ViewData["ProjectId"] = id;
-            ViewData["ProjectTitle"] = AccessPoint.Projects.First(p => p.Id == id).Name;
+            var project = GetProjectById(id);
+            ViewData["ProjectTitle"] = project.Name;
+            ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project");
 
             //get free programmers
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.Projects.Count == 0).Select(
+                AccessPoint.Users.Where(u => u.Role.Name == "Programmer").Select(
                     u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
             return View();
         }
@@ -84,7 +103,10 @@ namespace NProject.Controllers
         [HttpPost]
         public ActionResult AddStaff(int id, int userId)
         {
-            AccessPoint.Projects.First(p => p.Id == id).Team.Add(AccessPoint.Users.First(u => u.Id == userId));
+            var project = GetProjectById(id);
+            ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project");
+
+            project.Team.Add(AccessPoint.Users.First(u => u.Id == userId));
             AccessPoint.SaveChanges();
 
             return RedirectToAction("Team", new {id = id});
@@ -97,6 +119,16 @@ namespace NProject.Controllers
         [Authorize(Roles = "Director")]
         public ActionResult Create()
         {
+            ViewData["PM"] =
+                AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
+                    u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
+            ViewData["Customer"] =
+                AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
+                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
+            ViewData["Statuses"] =
+               AccessPoint.ProjectStatuses.Select(
+                   u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
+
             return View();
         } 
 
@@ -105,16 +137,30 @@ namespace NProject.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Director")]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(int statusId, int pmId, int customerId, Project p)
         {
-            try
+            if (ModelState.IsValid)
             {
-                // TODO: Add insert logic here
+                p.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
+                p.Team.Add(AccessPoint.Users.First(i => i.Id == pmId));
+                p.Customer = AccessPoint.Users.First(i => i.Id == customerId);
+                AccessPoint.Projects.Add(p);
+                AccessPoint.SaveChanges();
 
-                return RedirectToAction("Index");
+                return RedirectToAction("List");
             }
-            catch
+            else
             {
+                ViewData["PM"] =
+               AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
+                   u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
+                ViewData["Customer"] =
+                    AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
+                        u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
+                ViewData["Statuses"] =
+                   AccessPoint.ProjectStatuses.Select(
+                       u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
+
                 return View();
             }
         }
@@ -148,27 +194,29 @@ namespace NProject.Controllers
         //
         // GET: /Project/Delete/5
  
+        [Authorize(Roles="Director")]
         public ActionResult Delete(int id)
         {
-            return View();
+            var project = GetProjectById(id);
+            return View(project);
         }
 
         //
         // POST: /Project/Delete/5
 
+        [Authorize(Roles = "Director")]
+        [ValidateAntiForgeryToken]
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id, FormCollection values)
         {
-            try
-            {
-                // TODO: Add delete logic here
- 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            var project = GetProjectById(id);
+            project.Team.Clear();
+
+            AccessPoint.Projects.Remove(project);
+            AccessPoint.SaveChanges();
+
+            TempData["InformMessage"] = "Project removed";
+            return RedirectToAction("List");
         }
 
         /// <summary>
@@ -179,8 +227,11 @@ namespace NProject.Controllers
         [Authorize(Roles="PM, Director")]
         public ActionResult Team(int id)
         {
+            var project = GetProjectById(id);
+            ValidateAccessToProject(project, "PM", "You are not eligible to view team of this project");
+
             ViewData["ProjectId"] = id;
-            return View(AccessPoint.Projects.First(p => p.Id == id).Team.ToList());
+            return View(project.Team.ToList());
         }
     }
 }

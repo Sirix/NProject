@@ -324,6 +324,18 @@ div#title
     display: none;
 }
 
+.message-error
+{
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+    padding: 10px;
+}
+.message-inform
+{
+    border: 1px solid #F48E21;
+    background-color: #F4D521;
+    padding: 10px;
+}
 /* Styles for editor and display helpers
 ----------------------------------------------------------*/
 .display-label,

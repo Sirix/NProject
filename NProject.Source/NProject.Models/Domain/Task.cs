@@ -14,6 +14,11 @@ namespace NProject.Models.Domain
         public DateTime? EndDate { get; set; }
         public virtual ProjectStatus Status { get; set; }
         public virtual Project Project { get; set; }
-        public virtual User Responsible { get; set; } 
+        public virtual User Responsible { get; set; }
+
+        public Task()
+        {
+            CreationDate = DateTime.Now;
+        }
     }
 }

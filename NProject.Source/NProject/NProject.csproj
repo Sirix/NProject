@@ -123,8 +123,10 @@
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
     <Content Include="Views\Projects\ProjectTasks.aspx" />
+    <Content Include="Views\Projects\RemoveStaff.aspx" />
     <Content Include="Views\Projects\Team.aspx" />
     <Content Include="Views\Task\AddToProject.aspx" />
+    <Content Include="Views\Task\Edit.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

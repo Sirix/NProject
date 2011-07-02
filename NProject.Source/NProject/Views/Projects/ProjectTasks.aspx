@@ -12,6 +12,9 @@
         <tr>
             <th></th>
             <th>
+                Title
+            </th>
+            <th>
                 Description
             </th>
             <th>
@@ -33,8 +36,10 @@
         <tr>
             <td>
                 <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %> |
-                <%: Html.ActionLink("Details", "Details", "Task",new {  id=item.Id }, new object()) %> |
                 <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %> |
+            </td>
+            <td>
+                <%: item.Title %>
             </td>
             <td>
                 <%: item.Description %>

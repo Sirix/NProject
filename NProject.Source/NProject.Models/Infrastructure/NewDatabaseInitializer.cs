@@ -83,12 +83,12 @@ namespace NProject.Models.Infrastructure
                                    Customer = customer,
                                    CreationDate = DateTime.Now,
                                    Status = context.ProjectStatuses.First(),
-                                   Team = new List<User> {m1}
+                                   Team = new List<User> {m2}
                                };
 
 
             context.Projects.Add(project1);
-            var task1 = new Task {Description = "Create texture convertor", Responsible = p1};
+            var task1 = new Task {Title = "Converter", Description = "Create texture convertor", Responsible = p1};
             context.Tasks.Add(task1);
             context.Projects.Add(new Project
                                      {
@@ -96,7 +96,7 @@ namespace NProject.Models.Infrastructure
                                          Customer = customer,
                                          CreationDate = DateTime.Now,
                                          Status = context.ProjectStatuses.First(),
-                                         Team = new List<User> {m2},
+                                         Team = new List<User> {m1, p1},
                                          Tasks =
                                              new List<Task> {task1}
                                      });

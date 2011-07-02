@@ -12,6 +12,8 @@
     <table>
         <tr>
             <th>
+            </th>
+            <th>
                 Username
             </th>
             <th>
@@ -25,6 +27,9 @@
     <% foreach (var item in Model) { %>
     
         <tr>
+            <td>
+                <%: Html.ActionLink("Remove from team", "RemoveStaff", new { id = ViewData["ProjectId"], userId=item.Id})%>
+            </td>
             <td>
                 <%: item.Username %>
             </td>

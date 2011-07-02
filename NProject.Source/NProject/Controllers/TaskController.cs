@@ -68,55 +68,23 @@ namespace NProject.Controllers
                 return RedirectToAction("list", "Projects");
             }
         }
-
-        //
-        // GET: /Task/
-
-        public ActionResult Index()
-        {
-            return View();
-        }
-
-        //
-        // GET: /Task/Details/5
-
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        //
-        // GET: /Task/Create
-
-        public ActionResult Create()
-        {
-            return View();
-        } 
-
-        //
-        // POST: /Task/Create
-
-        [HttpPost]
-        public ActionResult Create(FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-        
         //
         // GET: /Task/Edit/5
  
+        [Authorize(Roles="PM")]
         public ActionResult Edit(int id)
         {
-            return View();
+            var task = AccessPoint.Tasks.First(i => i.Id == id);
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            //if this is a pm of a project
+            if (!task.Project.Team.Contains(user))
+            {
+                TempData["ErrorMessage"] = "You're not eligible to modify this task.";
+                RedirectToAction("Tasks", "Projects", new { id = task.Project.Id }).ExecuteResult(ControllerContext);
+            }
+
+            ViewData["ProjectId"] = task.Project.Id;
+            return View(task);
         }
 
         //

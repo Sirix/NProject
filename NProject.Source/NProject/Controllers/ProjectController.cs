@@ -91,9 +91,9 @@ namespace NProject.Controllers
             ViewData["ProjectTitle"] = project.Name;
             ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project");
 
-            //get free programmers
+            //get active programmers
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer").Select(
+                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.IsActive).Select(
                     u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
             return View();
         }
@@ -104,11 +104,16 @@ namespace NProject.Controllers
         public ActionResult AddStaff(int id, int userId)
         {
             var project = GetProjectById(id);
-            ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project");
+            ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project.");
+            var user = AccessPoint.Users.First(u => u.Id == userId);
+            if (user.Role.Name != "Programmer")
+            {
+                TempData["ErrorMessage"] = "You can add only programmers to project.";
+                return RedirectToAction("Team", new { id = id });
+            }
 
-            project.Team.Add(AccessPoint.Users.First(u => u.Id == userId));
+            project.Team.Add(user);
             AccessPoint.SaveChanges();
-
             return RedirectToAction("Team", new {id = id});
         }
 
@@ -232,6 +237,58 @@ namespace NProject.Controllers
 
             ViewData["ProjectId"] = id;
             return View(project.Team.ToList());
+        }
+        private void CheckRemoveStaffConditions(Project project, User user)
+        {
+            if (!project.Team.Contains(user))
+            {
+                TempData["ErrorMessage"] =
+                    "This user is not in the team of this project, so you can't remove himself from project team.";
+                RedirectToAction("Team", new {id = project.Id}).ExecuteResult(ControllerContext);
+            }
+            if (user.Role.Name == "PM")
+            {
+                TempData["ErrorMessage"] = "You can't remove yourself from project team.";
+                RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
+            }
+        }
+        /// <summary>
+        /// Removes user from project team
+        /// </summary>
+        /// <param name="id">Project id</param>
+        /// <param name="userId">user id</param>
+        /// <returns></returns>
+        [Authorize(Roles = "PM")]
+        public ActionResult RemoveStaff(int id, int userId)
+        {
+            var project = GetProjectById(id);
+            ValidateAccessToProject(project, "PM", "You are not eligible to manage team of this project.");
+            var user = AccessPoint.Users.First(i => i.Id == userId);
+            CheckRemoveStaffConditions(project, user);
+
+            ViewData["UserName"] = user.Username;
+            ViewData["UserId"] = user.Id;
+            ViewData["ProjectName"] = project.Name;
+            ViewData["ProjectId"] = project.Id;
+            return View();
+        }
+        
+        [Authorize(Roles = "PM")]
+        [ValidateAntiForgeryToken]
+        [HttpPost]
+        public ActionResult RemoveStaff(int id, int userId, FormCollection values)
+        {
+            var project = GetProjectById(id);
+            ValidateAccessToProject(project, "PM", "You are not eligible to manage team of this project.");
+            var user = AccessPoint.Users.First(i => i.Id == userId);
+            CheckRemoveStaffConditions(project, user);
+
+            project.Team.Remove(user);
+            AccessPoint.SaveChanges();
+            TempData["InformMessage"] = string.Format("User {0} has been removed from \"{1}\"'s team", user.Username,
+                                                      project.Name);
+
+            return RedirectToAction("Team", new {id = project.Id});
         }
     }
 }

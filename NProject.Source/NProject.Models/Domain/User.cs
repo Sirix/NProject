@@ -12,8 +12,15 @@ namespace NProject.Models.Domain
         [Required]
         public string Email { get; set; }
         public double HouseRate { get; set; }
+        public bool IsActive { get; set; }
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
+
+        public User()
+        {
+            IsActive = true;
+            Projects = new List<Project>();
+        }
     }
 }

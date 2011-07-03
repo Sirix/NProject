@@ -42,7 +42,7 @@
         <tr>
             <td>
                 <%:Html.ActionLink("Details", "Details", new { id = item.Id })%> | 
-                
+                <%:Html.ActionLink("Edit", "Edit", new {/* id=item.PrimaryKey */})%> |
                 <% if (!Model.UserIsCustomer)
 {%>
                 <%:Html.ActionLink("View team", "Team", new {id = item.Id})%> | 
@@ -53,8 +53,7 @@
                 <%
 }%>
                 <% if (Model.UserCanCreateAndDeleteProject) { %>  
-                    <%:Html.ActionLink("Edit", "Edit", new { id=item.Id })%> |
-                    <%:Html.ActionLink("Delete", "Delete", new { id=item.Id })%>
+                  | <%:Html.ActionLink("Delete", "Delete", new { id=item.Id})%>
                 <%  }%>
             </td>
             <td>

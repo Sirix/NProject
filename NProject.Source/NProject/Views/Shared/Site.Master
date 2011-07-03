@@ -22,6 +22,12 @@
             <div id="menucontainer">
             
                 <ul id="menu">
+                     <% if (Request.IsAuthenticated)
+                       {%>
+                    <li><%:Html.ActionLink("Meetings", "List", "Meeting")%></li>
+                    <%
+                       }%>
+
                     <% if (Request.IsAuthenticated)
                        {%>
                     <li><%:Html.ActionLink("Projects", "List", "Projects")%></li>

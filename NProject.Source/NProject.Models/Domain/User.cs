@@ -27,6 +27,7 @@ namespace NProject.Models.Domain
 
         public virtual Role Role { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
+        public virtual ICollection<Meeting> Meetings { get; set; }
 
         public User()
         {

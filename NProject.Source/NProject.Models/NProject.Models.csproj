@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Meeting.cs" />
     <Compile Include="Domain\Project.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\ProjectStatus.cs" />

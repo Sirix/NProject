@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using NProject.Models.Infrastructure;
 
 namespace NProject.Models.Domain
 {
@@ -12,15 +14,18 @@ namespace NProject.Models.Domain
         [Required]
         public string Email { get; set; }
         public double HouseRate { get; set; }
-        public bool IsActive { get; set; }
+
+        [NotMapped]
+        public UserState UserState
+        {
+            get { return (UserState) state; }
+            set { state = (byte) value; }
+        }
+
+        [Obsolete("This property is used only by EF. Use UserState property instead.")]
+        public byte state { get; set; }
 
         public virtual Role Role { get; set; }
-        public virtual ICollection<Project> Projects { get; set; }
-
-        public User()
-        {
-            IsActive = true;
-            Projects = new List<Project>();
-        }
+        public virtual Project Project { get; set; }
     }
 }

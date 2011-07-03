@@ -10,12 +10,13 @@ namespace NProject.Models.Domain
         public string Title { get; set; }
         [Required]
         public string Description { get; set; }
-        [Required]
         public DateTime CreationDate { get; set; }
-        public DateTime? BeginDate { get; set; }
-        public DateTime? EndDate { get; set; }
-        public TimeSpan? EstimatedTime { get; set; }
-        public TimeSpan? SpentTime { get; set; }
+        [Required, DataType(DataType.Date)]
+        public DateTime BeginDate { get; set; }
+        [Required, DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
+        public int EstimatedTime { get; set; } //in hours
+        public int SpentTime { get; set; } //in hours
 
         public virtual ProjectStatus Status { get; set; }
         public virtual Project Project { get; set; }

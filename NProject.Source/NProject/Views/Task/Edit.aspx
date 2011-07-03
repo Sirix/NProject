@@ -11,7 +11,7 @@
     <% using (Html.BeginForm()) {%>
         <%: Html.ValidationSummary(true) %>
         <%: Html.AntiForgeryToken() %>
-        <%: Html.Hidden("projectId", ViewData["ProjectId"]) %>
+        <%: Html.HiddenFor(model=>model.Id) %>
         <fieldset>
             <legend>Fields</legend>
 
@@ -45,7 +45,20 @@
                 <%: Html.TextBoxFor(model => model.EndDate, String.Format("{0:g}", Model.EndDate)) %>
                 <%: Html.ValidationMessageFor(model => model.EndDate) %>
             </div>
-            
+                        <div class="editor-label">
+                <%: Html.LabelFor(model => model.Status) %>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownList("statusId", (IEnumerable<SelectListItem>)ViewData["Statuses"]) %>
+                <%: Html.ValidationMessageFor(model => model.Status) %>
+            </div>
+            <div class="editor-label">
+                <%: Html.LabelFor(model => model.Responsible) %>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownList("responsibleId", (IEnumerable<SelectListItem>)ViewData["Users"]) %>
+                <%: Html.ValidationMessageFor(model => model.Responsible.Id) %>
+            </div>
             <p>
                 <input type="submit" value="Save" />
             </p>

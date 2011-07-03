@@ -88,7 +88,16 @@ namespace NProject.Models.Infrastructure
 
 
             context.Projects.Add(project1);
-            var task1 = new Task {Title = "Converter", Description = "Create texture convertor", Responsible = p1};
+            var task1 = new Task
+                            {
+                                Title = "Converter",
+                                Description = "Create texture convertor",
+                                Responsible = p1,
+                                CreationDate = DateTime.Now,
+                                BeginDate = DateTime.Now,
+                                EndDate = DateTime.Now.AddDays(1),
+                                Status = context.ProjectStatuses.First()
+                            };
             context.Tasks.Add(task1);
             context.Projects.Add(new Project
                                      {

@@ -32,7 +32,8 @@ namespace NProject.Controllers
 
         private void FillViewAddToProject(int id)
         {
-            ViewData["ProjectTitle"] = AccessPoint.Projects.First(p => p.Id == id).Name;
+            var project = AccessPoint.Projects.First(p => p.Id == id);
+            ViewData["ProjectTitle"] = project.Name;
 
             ViewData["Statuses"] =
                 AccessPoint.ProjectStatuses.Select(p => new SelectListItem { Text = p.Name, Value = SqlFunctions.StringConvert((double)p.Id) }).
@@ -40,7 +41,7 @@ namespace NProject.Controllers
 
             //TODO: maybe add filter on users?
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer").Select(
+                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.Project.Id == project.Id).Select(
                     u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).
                     ToList();
         }
@@ -83,7 +84,26 @@ namespace NProject.Controllers
                 RedirectToAction("Tasks", "Projects", new { id = task.Project.Id }).ExecuteResult(ControllerContext);
             }
 
-            ViewData["ProjectId"] = task.Project.Id;
+            ViewData["Statuses"] =
+                AccessPoint.ProjectStatuses.Select(
+                    p =>
+                    new SelectListItem
+                        {
+                            Text = p.Name,
+                            Value = SqlFunctions.StringConvert((double) p.Id),
+                            Selected = task.Status.Name == p.Name
+                        }).
+                    ToList();
+
+            ViewData["Users"] =
+                task.Project.Team.Where(u => u.Role.Name == "Programmer").Select(
+                    u =>
+                    new SelectListItem
+                        {
+                            Text = u.Username,
+                            Value = u.Id.ToString(),
+                            Selected = u.Id == task.Responsible.Id
+                        });
             return View(task);
         }
 
@@ -91,17 +111,59 @@ namespace NProject.Controllers
         // POST: /Task/Edit/5
 
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        [Authorize(Roles = "PM"), ValidateAntiForgeryToken]
+        public ActionResult Edit(Task t, int responsibleId, int statusId)
         {
-            try
+            var task = AccessPoint.Tasks.First(i => i.Id == t.Id);
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            //if this is a pm of a project
+            if (!task.Project.Team.Contains(user))
             {
-                // TODO: Add update logic here
- 
-                return RedirectToAction("Index");
+                TempData["ErrorMessage"] = "You're not eligible to modify this task.";
+                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
             }
-            catch
+            //check for a new responsible user
+            var respUser = AccessPoint.Users.First(i => i.Id == responsibleId);
+            if (!task.Project.Team.Contains(respUser))
             {
-                return View();
+                TempData["ErrorMessage"] = "Selected responsible user is not in this project's team.";
+                return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
+            }
+
+            if (ModelState.IsValid)
+            {
+                t.Project = task.Project;
+                t.Responsible = respUser;
+                t.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
+                AccessPoint.ObjectContext.ApplyCurrentValues("Tasks", t);
+                AccessPoint.SaveChanges();
+
+                TempData["InformMessage"] = "Task has been updated.";
+                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+            }
+            else
+            {
+                ViewData["Statuses"] =
+                    AccessPoint.ProjectStatuses.Select(
+                        p =>
+                        new SelectListItem
+                            {
+                                Text = p.Name,
+                                Value = SqlFunctions.StringConvert((double) p.Id),
+                                Selected = task.Status.Name == p.Name
+                            }).
+                        ToList();
+
+                ViewData["Users"] =
+                    task.Project.Team.Where(u => u.Role.Name == "Programmer").Select(
+                        u =>
+                        new SelectListItem
+                            {
+                                Text = u.Username,
+                                Value = u.Id.ToString(),
+                                Selected = u.Id == task.Responsible.Id
+                            });
+                return View(t);
             }
         }
 

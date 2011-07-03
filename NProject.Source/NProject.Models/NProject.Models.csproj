@@ -68,6 +68,7 @@
     <Compile Include="Infrastructure\IAccessPoint.cs" />
     <Compile Include="Infrastructure\InMemoryDbSet.cs" />
     <Compile Include="Infrastructure\NewDatabaseInitializer.cs" />
+    <Compile Include="Infrastructure\UserState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

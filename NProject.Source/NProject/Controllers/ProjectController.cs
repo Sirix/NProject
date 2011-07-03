@@ -93,7 +93,7 @@ namespace NProject.Controllers
 
             //get active programmers
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.IsActive).Select(
+                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Free).Select(
                     u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
             return View();
         }

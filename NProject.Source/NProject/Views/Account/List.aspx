@@ -20,6 +20,9 @@
             <th>
                 Role
             </th>
+            <th>
+                State
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
@@ -37,6 +40,9 @@
             </td>
             <td>
                 <%: item.Role %>
+            </td>
+            <td>
+                <%: item.UserState %>
             </td>
         </tr>
     

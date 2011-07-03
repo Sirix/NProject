@@ -28,8 +28,11 @@
                 DeliveryDate
             </th>
             <th>
-                Current project status
+                Project status
             </th>
+            <% if (Model.UserCanCreateAndDeleteProject) { %>  
+                  <th>Responsible</th>
+                <%  }%>
         </tr>
 
     <%
@@ -71,6 +74,9 @@
             <td>
                 <%:item.Status%>
             </td>
+            <% if (Model.UserCanCreateAndDeleteProject) { %>  
+                  <td><%: item.Team.First(i=>i.Role.Name=="PM").Username%></td>
+                <%  }%>
         </tr>
     
     <%

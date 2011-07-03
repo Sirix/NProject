@@ -95,7 +95,7 @@ namespace NProject.Models
         ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
         User GetUserById(int userId);
 
-        bool UpdateUserRole(int id, int roleId);
+        bool UpdateUser(int id, int roleId, int stateId);
     }
 
     public class AccountMembershipService : IMembershipService
@@ -186,7 +186,7 @@ namespace NProject.Models
             return _provider.GetUserById(userId);
         }
 
-        public bool UpdateUserRole(int id, int roleId)
+        public bool UpdateUser(int id, int roleId, int stateId)
         {
             var user = AccessPoint.Users.First(u => u.Id == id);
             var role = AccessPoint.Roles.First(r => r.Id == roleId);
@@ -199,6 +199,8 @@ namespace NProject.Models
                 return false;
             }
             user.Role = role;
+            user.UserState = (UserState) stateId;
+
             AccessPoint.SaveChanges();
 
             return true;

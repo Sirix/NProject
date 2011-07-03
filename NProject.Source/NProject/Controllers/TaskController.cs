@@ -39,11 +39,14 @@ namespace NProject.Controllers
                 AccessPoint.ProjectStatuses.Select(p => new SelectListItem { Text = p.Name, Value = SqlFunctions.StringConvert((double)p.Id) }).
                     ToList();
 
-            //TODO: maybe add filter on users?
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.Project.Id == project.Id).Select(
-                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).
-                    ToList();
+                project.Team.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Working).Select(
+                    u =>
+                    new SelectListItem
+                    {
+                        Text = u.Username,
+                        Value = u.Id.ToString(),
+                    });
         }
 
         [Authorize(Roles = "PM")]
@@ -104,6 +107,7 @@ namespace NProject.Controllers
                             Value = u.Id.ToString(),
                             Selected = u.Id == task.Responsible.Id
                         });
+            ViewData["ProjectId"] = task.Project.Id;
             return View(task);
         }
 

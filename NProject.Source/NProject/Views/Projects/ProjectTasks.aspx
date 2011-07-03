@@ -7,7 +7,9 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
     <h2>Project tasks</h2>
-
+     <p>
+        <%: Html.ActionLink("Back to projects", "List")%>
+    </p>
     <table>
         <tr>
             <th></th>
@@ -29,6 +31,9 @@
             <th>
                 Responsible
             </th>
+            <th>
+                Status
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
@@ -36,7 +41,7 @@
         <tr>
             <td>
                 <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %> |
-                <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %> |
+                <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %>
             </td>
             <td>
                 <%: item.Title %>
@@ -55,6 +60,9 @@
             </td>
             <td>
                 <%: item.Responsible.Username %>
+            </td>
+            <td>
+                <%: item.Status %>
             </td>
         </tr>
     

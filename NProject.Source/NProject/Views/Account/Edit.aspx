@@ -22,6 +22,13 @@
                 <%: Html.DropDownList("roleId", (List<SelectListItem>)ViewData["Roles"])%>
                 <%: Html.ValidationMessageFor(model => model.Role) %>
             </div>
+            <div class="editor-label">
+                <%: Html.LabelFor(model => model.UserState) %>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownList("userStateId", (List<SelectListItem>)ViewData["UserStates"])%>
+                <%: Html.ValidationMessageFor(model => model.UserState) %>
+            </div>
             <p>
                 <input type="submit" value="Save" />
             </p>

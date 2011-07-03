@@ -14,8 +14,6 @@ namespace NProject.Models.Infrastructure
         {
             SeedNeededToLaunchData(context);
             SeedFakeData(context);
-
-
         }
         private void SeedFakeData(T context)
         {

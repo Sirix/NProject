@@ -26,6 +26,11 @@ namespace NProject.Models.Domain
         public byte state { get; set; }
 
         public virtual Role Role { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
+
+        public User()
+        {
+            UserState = UserState.Working;
+        }
     }
 }

@@ -93,8 +93,15 @@ namespace NProject.Controllers
 
             //get active programmers
             ViewData["Users"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Free).Select(
-                    u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
+                AccessPoint.Users.Where(
+                    u =>
+                    u.Role.Name == "Programmer" &&
+                    (u.state) == (byte) (UserState.Working) &&
+                    !u.Projects.Select(i => i.Id).Contains(project.Id)).
+                    Select(
+                        u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)}).
+                    ToList();
+
             return View();
         }
 
@@ -106,14 +113,15 @@ namespace NProject.Controllers
             var project = GetProjectById(id);
             ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project.");
             var user = AccessPoint.Users.First(u => u.Id == userId);
-            if (user.Role.Name != "Programmer")
+            if (user.Role.Name != "Programmer" || user.UserState != UserState.Working)
             {
-                TempData["ErrorMessage"] = "You can add only programmers to project.";
-                return RedirectToAction("Team", new { id = id });
+                TempData["ErrorMessage"] = "You can add only working programmers to project.";
+                return RedirectToAction("Team", new {id = id});
             }
 
             project.Team.Add(user);
             AccessPoint.SaveChanges();
+            TempData["InformMessage"] = "Programmer has been added to the project's team";
             return RedirectToAction("Team", new {id = id});
         }
 
@@ -144,6 +152,7 @@ namespace NProject.Controllers
         [Authorize(Roles = "Director")]
         public ActionResult Create(int statusId, int pmId, int customerId, Project p)
         {
+            //TODO: Add check for roles of pmId, customerId
             if (ModelState.IsValid)
             {
                 p.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
@@ -236,7 +245,7 @@ namespace NProject.Controllers
             ValidateAccessToProject(project, "PM", "You are not eligible to view team of this project");
 
             ViewData["ProjectId"] = id;
-            return View(project.Team.ToList());
+            return View(project.Team.OrderBy(u => u.Role.Name).ToList());
         }
         private void CheckRemoveStaffConditions(Project project, User user)
         {

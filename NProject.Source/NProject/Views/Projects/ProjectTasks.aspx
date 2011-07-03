@@ -69,10 +69,13 @@
     <% } %>
 
     </table>
-
+    <%if ((bool)ViewData["CanCreateProjects"])
+      {%>
     <p>
-        <%: Html.ActionLink("Add new task", "AddToProject", "Task", new { id = ViewData["ProjectId"] }, new object { })%>
+        <%:Html.ActionLink("Add new task", "AddToProject", "Task", new {id = ViewData["ProjectId"]},
+                                            new object {})%>
     </p>
-
+    <%
+      }%>
 </asp:Content>
 

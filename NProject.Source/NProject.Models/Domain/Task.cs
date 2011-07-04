@@ -15,7 +15,7 @@ namespace NProject.Models.Domain
         public DateTime BeginDate { get; set; }
         [Required, DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
-        public int EstimatedTime { get; set; } //in hours
+        public DateTime EstimatedTime { get; set; }
         public int SpentTime { get; set; } //in hours
 
         public virtual ProjectStatus Status { get; set; }

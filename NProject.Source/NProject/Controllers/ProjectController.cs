@@ -67,7 +67,8 @@ namespace NProject.Controllers
 
             var tasks = project.Tasks.ToList();
             ViewData["ProjectId"] = id;
-            ViewData["CanCreateProjects"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "PM";
+            ViewData["CanCreateTasks"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "PM";
+            ViewData["CanExecuteTask"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "Programmer";
             return View("ProjectTasks", tasks);
         }
 

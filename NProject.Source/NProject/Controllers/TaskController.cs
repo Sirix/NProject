@@ -196,5 +196,81 @@ namespace NProject.Controllers
                 return View();
             }
         }
+
+        [Authorize(Roles = "Programmer")]
+        public ActionResult Take(int id)
+        {
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var task = AccessPoint.Tasks.First(t => t.Id == id);
+            //check for user is responsible for this task
+            if (task.Responsible.Id != user.Id)
+            {
+                TempData["ErrorMessage"] = "You're not eligible to take this task";
+                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+            }
+            //check for already taken task
+            if (task.Status.Name == "Developing")
+            {
+                TempData["ErrorMessage"] = "You already took this task.";
+                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+            }
+            task.Status = AccessPoint.ProjectStatuses.First(p => p.Name == "Developing");
+            AccessPoint.SaveChanges();
+            TempData["InformMessage"] = "You have taken this task";
+            return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+        }
+
+        [Authorize(Roles = "Programmer")]
+        public ActionResult Complete(int id)
+        {
+            CheckConditionsForCompleteTask(id);
+            var task = AccessPoint.Tasks.First(t => t.Id == id);
+
+            ViewData["Statuses"] =
+               AccessPoint.ProjectStatuses.Select(
+                   u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
+            return View(task);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Programmer")]
+        public ActionResult Complete(int id, int spentTime, int statusId)
+        {
+            CheckConditionsForCompleteTask(id);
+            var task = AccessPoint.Tasks.First(t => t.Id == id);
+            if (spentTime <= 0)
+            {
+                TempData["ErrorMessage"] = "Spent time in hours must be greater than zero.";
+                ViewData["Statuses"] =
+                    AccessPoint.ProjectStatuses.Select(
+                        u => new SelectListItem {Text = u.Name, Value = SqlFunctions.StringConvert((double) u.Id)});
+                return View(task);
+            }
+            task.EstimatedTime = task.EndDate - task.BeginDate;
+            task.EndDate = DateTime.Now;
+            task.SpentTime = spentTime;
+            task.Status = AccessPoint.ProjectStatuses.First(p => p.Id == statusId);
+            AccessPoint.SaveChanges();
+
+            TempData["InformMessage"] = "Task has been updated.";
+            return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+        }
+        private void CheckConditionsForCompleteTask(int id)
+        {
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var task = AccessPoint.Tasks.First(t => t.Id == id);
+            //check for user is responsible for this task
+            if (task.Responsible.Id != user.Id)
+            {
+                TempData["ErrorMessage"] = "You're not eligible to complete this task";
+                RedirectToAction("Tasks", "Projects", new {id = task.Project.Id}).ExecuteResult(ControllerContext);
+            }
+            //check for already finished task
+            if (task.Status.Name == "Finished")
+            {
+                TempData["ErrorMessage"] = "This task already finished";
+                RedirectToAction("Tasks", "Projects", new {id = task.Project.Id}).ExecuteResult(ControllerContext);
+            }
+        }
     }
 }

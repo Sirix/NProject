@@ -40,8 +40,17 @@
     
         <tr>
             <td>
+            <% if((bool)ViewData["CanExecuteTask"])
+{%>
+                <%: Html.ActionLink("Start task", "Take", "Task", new {  id=item.Id }, new object()) %> |
+                <%: Html.ActionLink("Complete", "Complete", "Task", new {  id=item.Id }, new object()) %> |
+            <%
+}%>
+            <% if ((bool)ViewData["CanCreateTasks"])
+{%>
                 <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %> |
                 <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %>
+            <%}%>
             </td>
             <td>
                 <%: item.Title %>
@@ -69,7 +78,7 @@
     <% } %>
 
     </table>
-    <%if ((bool)ViewData["CanCreateProjects"])
+    <%if ((bool)ViewData["CanCreateTasks"])
       {%>
     <p>
         <%:Html.ActionLink("Add new task", "AddToProject", "Task", new {id = ViewData["ProjectId"]},

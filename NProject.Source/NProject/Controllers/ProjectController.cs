@@ -18,7 +18,7 @@ namespace NProject.Controllers
 
         //
         // GET: /Projects/
-        [Authorize(Roles = "PM, Director, Customer")]
+        [Authorize(Roles = "PM, Director, Customer, Programmer")]
         public ActionResult List()
         {
             var model = new ProjectListViewModel();
@@ -43,6 +43,11 @@ namespace NProject.Controllers
                     projects = AccessPoint.Projects.ToList().Where(p => p.Team.Contains(manager)).ToList();
                     model.TableTitle = "Projects in which you're involved";
                     break;
+
+                case "Programmer":
+                    projects = AccessPoint.Users.First(u => u.Username == User.Identity.Name).Projects.ToList();
+                    model.TableTitle = "Projects in which you're involved";
+                    break;
             }
             model.Projects = projects;
             model.UserCanCreateAndDeleteProject = role == "Director";
@@ -54,7 +59,7 @@ namespace NProject.Controllers
 
         //
         // GET: /Project/Tasks/5
-        [Authorize(Roles = "PM, Director")]
+        [Authorize(Roles = "PM, Director, Programmer")]
         public ActionResult Tasks(int id)
         {
             var project = GetProjectById(id);
@@ -62,13 +67,14 @@ namespace NProject.Controllers
 
             var tasks = project.Tasks.ToList();
             ViewData["ProjectId"] = id;
+            ViewData["CanCreateProjects"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "PM";
             return View("ProjectTasks", tasks);
         }
 
         private void ValidateAccessToProject(Project project, string role, string errorMessage)
         {
             var user = AccessPoint.Users.First(i => i.Username == User.Identity.Name);
-            if (!project.Team.Contains(user) && user.Role.Name == role)
+            if (!project.Team.Contains(user) && user.Role.Name != "Director")
             {
                 TempData["ErrorMessage"] = errorMessage;
                 RedirectToAction("List").ExecuteResult(ControllerContext);
@@ -238,7 +244,7 @@ namespace NProject.Controllers
         /// </summary>
         /// <param name="id">Project id</param>
         /// <returns></returns>
-        [Authorize(Roles="PM, Director")]
+        [Authorize(Roles="PM, Director, Programmer")]
         public ActionResult Team(int id)
         {
             var project = GetProjectById(id);
@@ -259,6 +265,12 @@ namespace NProject.Controllers
             {
                 TempData["ErrorMessage"] = "You can't remove yourself from project team.";
                 RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
+            }
+            //user has unfinished tasks
+            if (project.Tasks.Where(t => t.Responsible.Id == user.Id && t.Status.Name != "Finished").Any())
+            {
+                TempData["ErrorMessage"] = "Please, transfer tasks of this programmer to other before his removing.\nOr, just complete them.";
+                RedirectToAction("Team", new {id = project.Id}).ExecuteResult(ControllerContext);
             }
         }
         /// <summary>

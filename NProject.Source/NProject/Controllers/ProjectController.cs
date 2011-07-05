@@ -103,10 +103,10 @@ namespace NProject.Controllers
                 AccessPoint.Users.Where(
                     u =>
                     u.Role.Name == "Programmer" &&
-                    (u.state) == (byte) (UserState.Working) &&
+                    (u.state) == (byte)(UserState.Working) &&
                     !u.Projects.Select(i => i.Id).Contains(project.Id)).
                     Select(
-                        u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)}).
+                        u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).
                     ToList();
 
             return View();
@@ -123,13 +123,13 @@ namespace NProject.Controllers
             if (user.Role.Name != "Programmer" || user.UserState != UserState.Working)
             {
                 TempData["ErrorMessage"] = "You can add only working programmers to project.";
-                return RedirectToAction("Team", new {id = id});
+                return RedirectToAction("Team", new { id = id });
             }
 
             project.Team.Add(user);
             AccessPoint.SaveChanges();
             TempData["InformMessage"] = "Programmer has been added to the project's team";
-            return RedirectToAction("Team", new {id = id});
+            return RedirectToAction("Team", new { id = id });
         }
 
 
@@ -141,7 +141,7 @@ namespace NProject.Controllers
         {
             ViewData["PM"] =
                 AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
-                    u => new SelectListItem {Text = u.Username, Value = SqlFunctions.StringConvert((double) u.Id)});
+                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
             ViewData["Customer"] =
                 AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
                     u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
@@ -150,7 +150,7 @@ namespace NProject.Controllers
                    u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
 
             return View();
-        } 
+        }
 
         //
         // POST: /Project/Create
@@ -185,10 +185,10 @@ namespace NProject.Controllers
                 return View();
             }
         }
-        
+
         //
         // GET: /Project/Edit/5
- 
+
         public ActionResult Edit(int id)
         {
             return View();
@@ -203,7 +203,7 @@ namespace NProject.Controllers
             try
             {
                 // TODO: Add update logic here
- 
+
                 return RedirectToAction("Index");
             }
             catch
@@ -214,8 +214,8 @@ namespace NProject.Controllers
 
         //
         // GET: /Project/Delete/5
- 
-        [Authorize(Roles="Director")]
+
+        [Authorize(Roles = "Director")]
         public ActionResult Delete(int id)
         {
             var project = GetProjectById(id);
@@ -245,7 +245,7 @@ namespace NProject.Controllers
         /// </summary>
         /// <param name="id">Project id</param>
         /// <returns></returns>
-        [Authorize(Roles="PM, Director, Programmer")]
+        [Authorize(Roles = "PM, Director, Programmer")]
         public ActionResult Team(int id)
         {
             var project = GetProjectById(id);
@@ -260,7 +260,7 @@ namespace NProject.Controllers
             {
                 TempData["ErrorMessage"] =
                     "This user is not in the team of this project, so you can't remove himself from project team.";
-                RedirectToAction("Team", new {id = project.Id}).ExecuteResult(ControllerContext);
+                RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
             }
             if (user.Role.Name == "PM")
             {
@@ -271,7 +271,7 @@ namespace NProject.Controllers
             if (project.Tasks.Where(t => t.Responsible.Id == user.Id && t.Status.Name != "Finished").Any())
             {
                 TempData["ErrorMessage"] = "Please, transfer tasks of this programmer to other before his removing.\nOr, just complete them.";
-                RedirectToAction("Team", new {id = project.Id}).ExecuteResult(ControllerContext);
+                RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
             }
         }
         /// <summary>
@@ -294,7 +294,7 @@ namespace NProject.Controllers
             ViewData["ProjectId"] = project.Id;
             return View();
         }
-        
+
         [Authorize(Roles = "PM")]
         [ValidateAntiForgeryToken]
         [HttpPost]
@@ -310,7 +310,34 @@ namespace NProject.Controllers
             TempData["InformMessage"] = string.Format("User {0} has been removed from \"{1}\"'s team", user.Username,
                                                       project.Name);
 
-            return RedirectToAction("Team", new {id = project.Id});
+            return RedirectToAction("Team", new { id = project.Id });
+        }
+
+        [Authorize(Roles = "PM, Director, Customer, Programmer")]
+        public ActionResult Details(int id)
+        {
+            var project = GetProjectById(id);
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            string role = user.Role.Name;
+
+            switch (role)
+            {
+                case "Director":
+                    return View(project);
+
+                case "Customer":
+                    if (project.Customer.Id == user.Id)
+                        return View(project);
+                    break;
+
+                case "PM":
+                case "Programmer":
+                    if (project.Team.Contains(user))
+                        return View(project);
+                    break;
+            }
+            TempData["ErrorMessage"] = "You can't view information about this project";
+            return RedirectToAction("List");
         }
     }
 }

@@ -246,7 +246,7 @@ namespace NProject.Controllers
                         u => new SelectListItem {Text = u.Name, Value = SqlFunctions.StringConvert((double) u.Id)});
                 return View(task);
             }
-            task.EstimatedTime = task.EndDate - task.BeginDate;
+            //task.EstimatedTime = (task.EndDate - task.BeginDate);
             task.EndDate = DateTime.Now;
             task.SpentTime = spentTime;
             task.Status = AccessPoint.ProjectStatuses.First(p => p.Id == statusId);

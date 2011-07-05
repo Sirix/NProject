@@ -123,6 +123,7 @@
     <Content Include="Views\Projects\AddStaff.aspx" />
     <Content Include="Views\Projects\Create.aspx" />
     <Content Include="Views\Projects\Delete.aspx" />
+    <Content Include="Views\Projects\Details.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
     <Content Include="Views\Projects\ProjectTasks.aspx" />

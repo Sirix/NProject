@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data.Objects.SqlClient;
 using System.Linq;
 using System.Web.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.Practices.Unity;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
+using System.Collections.Generic;
 
 namespace NProject.Controllers
 {
@@ -139,16 +141,8 @@ namespace NProject.Controllers
         [Authorize(Roles = "Director")]
         public ActionResult Create()
         {
-            ViewData["PM"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
-                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
-            ViewData["Customer"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
-                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
-            ViewData["Statuses"] =
-               AccessPoint.ProjectStatuses.Select(
-                   u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
-
+            FillCreateEditForm();
+            ViewData["PageTitle"] = "Create";
             return View();
         }
 
@@ -159,56 +153,112 @@ namespace NProject.Controllers
         [Authorize(Roles = "Director")]
         public ActionResult Create(int statusId, int pmId, int customerId, Project p)
         {
-            //TODO: Add check for roles of pmId, customerId
-            if (ModelState.IsValid)
+            try
             {
+                if (!ModelState.IsValid) throw new ArgumentException();
+
+                var pmUser = AccessPoint.Users.First(i => i.Id == pmId);
+                if (pmUser.Role.Name != "PM")
+                {
+                    TempData["ErrorMessage"] = "You must select PM in PM field.";
+                    throw new ArgumentException();
+                    
+                }
+                var customUser = AccessPoint.Users.First(i => i.Id == customerId);
+                if (customUser.Role.Name != "Customer")
+                {
+                    TempData["ErrorMessage"] = "You must select customer in customer field.";
+                    throw new ArgumentException();
+
+                }
                 p.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
-                p.Team.Add(AccessPoint.Users.First(i => i.Id == pmId));
-                p.Customer = AccessPoint.Users.First(i => i.Id == customerId);
+                p.Team.Add(pmUser);
+                p.Customer = customUser;
                 AccessPoint.Projects.Add(p);
                 AccessPoint.SaveChanges();
 
                 return RedirectToAction("List");
             }
-            else
+            catch (ArgumentException)
             {
-                ViewData["PM"] =
-               AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
-                   u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
-                ViewData["Customer"] =
-                    AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
-                        u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) });
-                ViewData["Statuses"] =
-                   AccessPoint.ProjectStatuses.Select(
-                       u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) });
-
+                FillCreateEditForm();
                 return View();
             }
         }
 
+        private void FillCreateEditForm()
+        {
+            ViewData["PM"] =
+              AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
+                  u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
+            ViewData["Customer"] =
+                AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
+                    u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
+            ViewData["Statuses"] =
+               AccessPoint.ProjectStatuses.Select(
+                   u => new SelectListItem { Text = u.Name, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
+        }
         //
         // GET: /Project/Edit/5
 
+        [Authorize(Roles="Director")]
         public ActionResult Edit(int id)
         {
-            return View();
+            var project = GetProjectById(id);
+            ViewData["PageTitle"] = "Edit";
+            FillCreateEditForm();
+            (ViewData["PM"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Team.First(u => u.Role.Name == "PM").Username).
+                Selected = true;
+            (ViewData["Customer"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Customer.Username).
+                Selected = true;
+            (ViewData["Statuses"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Status.Name).
+                Selected = true;
+
+            return View("Create", project);
         }
 
         //
         // POST: /Project/Edit/5
-
+        [Authorize(Roles = "Director")]
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int statusId, int pmId, int customerId, Project p)
         {
             try
             {
-                // TODO: Add update logic here
+                var project = GetProjectById(p.Id);
+                if (!ModelState.IsValid) throw new ArgumentException();
 
-                return RedirectToAction("Index");
+                var pmUser = AccessPoint.Users.First(i => i.Id == pmId);
+                if (pmUser.Role.Name != "PM")
+                {
+                    TempData["ErrorMessage"] = "You must select PM in PM field.";
+                    throw new ArgumentException();
+
+                }
+                var customUser = AccessPoint.Users.First(i => i.Id == customerId);
+                if (customUser.Role.Name != "Customer")
+                {
+                    TempData["ErrorMessage"] = "You must select customer in customer field.";
+                    throw new ArgumentException();
+
+                }
+                p.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
+                p.Team = project.Team;
+                p.Tasks = project.Tasks;
+                p.Team.Remove(p.Team.First(u => u.Role.Name == "PM"));
+                p.Team.Add(pmUser);
+                p.Customer = customUser;
+                AccessPoint.ObjectContext.ApplyCurrentValues("Projects", p);
+                AccessPoint.SaveChanges();
+
+                TempData["InformMessage"] = "Project has been updated.";
+                return RedirectToAction("List");
             }
-            catch
+            catch (ArgumentException)
             {
-                return View();
+                FillCreateEditForm();
+                return View("Create", p);
             }
         }
 

@@ -1,16 +1,17 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.Domain.Project>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-	Create
+	<%: ViewData["PageTitle"] %>
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Create</h2>
+    <h2><%: ViewData["PageTitle"] %></h2>
 
     <% using (Html.BeginForm()) {%>
         <%: Html.ValidationSummary(true) %>
-
+        <%: Html.AntiForgeryToken() %>
+        <%: Html.HiddenFor(model=>model.Id) %>
         <fieldset>
             <legend>Fields</legend>
                         
@@ -78,7 +79,7 @@
                 <%: Html.DropDownList("customerId", (IEnumerable<SelectListItem>)ViewData["Customer"]) %>
             </div>
             <p>
-                <input type="submit" value="Create" />
+                <input type="submit" value="<%: ViewData["PageTitle"] %>" />
             </p>
         </fieldset>
 

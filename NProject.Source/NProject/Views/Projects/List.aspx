@@ -46,7 +46,7 @@
                 <% if (!Model.UserIsCustomer)
 {%>
                 <%:Html.ActionLink("View team", "Team", new {id = item.Id})%> | 
-                <%:Html.ActionLink("View tasks", "Tasks", new {id = item.Id})%>
+                <%:Html.ActionLink("View tasks", "Tasks", new {id = item.Id})%> |
                 <%
 }%>                <% if (Model.UserCanManageMeetings) { %> 
                  | <%:Html.ActionLink("Meetings", "List", "Meeting", new {id = item.Id}, new object{})%>
@@ -54,7 +54,7 @@
 }%>
                 <% if (Model.UserCanCreateAndDeleteProject) { %>  
                     <%:Html.ActionLink("Edit", "Edit", new { id=item.Id })%> |
-                    <%:Html.ActionLink("Delete", "Delete", new { id=item.Id })%>
+                <!--    <%:Html.ActionLink("Delete", "Delete", new { id=item.Id })%>  -->
                 <%  }%>
             </td>
             <td>

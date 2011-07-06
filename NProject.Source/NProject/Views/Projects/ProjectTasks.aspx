@@ -48,8 +48,8 @@
 }%>
             <% if ((bool)ViewData["CanCreateTasks"])
 {%>
-                <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %> |
-                <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %>
+                <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %>
+           <!--   |   <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %> -->
             <%}%>
             </td>
             <td>

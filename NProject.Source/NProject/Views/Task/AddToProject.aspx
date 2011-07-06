@@ -11,7 +11,7 @@
     <% using (Html.BeginForm()) {%>
         <%: Html.HiddenFor(model => model.ProjectId) %>
         <%: Html.AntiForgeryToken() %>
-        <%: Html.ValidationSummary(true) %>
+        <%: Html.ValidationSummary() %>
 
         <fieldset>
             <legend>Fields</legend>

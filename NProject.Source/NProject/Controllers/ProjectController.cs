@@ -302,6 +302,8 @@ namespace NProject.Controllers
             ValidateAccessToProject(project, "PM", "You are not eligible to view team of this project");
 
             ViewData["ProjectId"] = id;
+            ViewData["CanManageTeam"] = AccessPoint.Users.First(u => u.Username == User.Identity.Name).Role.Name ==
+            "PM";
             return View(project.Team.OrderBy(u => u.Role.Name).ToList());
         }
         private void CheckRemoveStaffConditions(Project project, User user)

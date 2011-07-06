@@ -171,10 +171,10 @@ namespace NProject.Controllers
 
             if (ModelState.IsValid)
             {
-                t.Project = task.Project;
-                t.Responsible = respUser;
-                t.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
                 AccessPoint.ObjectContext.ApplyCurrentValues("Tasks", t);
+                task.Responsible = respUser;
+                var status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
+                task.Status = status;
                 AccessPoint.SaveChanges();
 
                 TempData["InformMessage"] = "Task has been updated.";

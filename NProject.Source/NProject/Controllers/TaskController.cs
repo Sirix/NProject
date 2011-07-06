@@ -8,6 +8,7 @@ using Microsoft.Practices.Unity;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
+using NProject.Models.ViewModels;
 
 namespace NProject.Controllers
 {
@@ -25,51 +26,85 @@ namespace NProject.Controllers
         [Authorize(Roles="PM")]
         public ActionResult AddToProject(int id)
         {
-            FillViewAddToProject(id);
-
-            return View();
+            ValidateAccessToProject(id);
+            var model = CreateAddToProjectViewModel(id);
+            return View(model);
         }
 
-        private void FillViewAddToProject(int id)
+        /// <summary>
+        /// Validates currently logged user access to project, which specified by id.
+        /// </summary>
+        /// <param name="projectId">Project id</param>
+        private void ValidateAccessToProject(int projectId)
         {
-            var project = AccessPoint.Projects.First(p => p.Id == id);
-            ViewData["ProjectTitle"] = project.Name;
+            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var project = AccessPoint.Projects.First(p => p.Id == projectId);
+            if (!project.Team.Contains(user))
+            {
+                TempData["ErrorMessage"] = "You're not eligible to manage tasks of this project";
+                RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
+            }
+        }
 
-            ViewData["Statuses"] =
-                AccessPoint.ProjectStatuses.Select(p => new SelectListItem { Text = p.Name, Value = SqlFunctions.StringConvert((double)p.Id) }).
+        /// <summary>
+        /// Creates and fills view model to addToProject view.
+        /// </summary>
+        /// <param name="projectId">Target project id</param>
+        /// <param name="modelToRefresh">If specified, view model will be refreshed instead of creating new</param>
+        /// <returns></returns>
+        private TaskAddToProjectViewModel CreateAddToProjectViewModel(int projectId, TaskAddToProjectViewModel modelToRefresh = null)
+        {
+            var model = modelToRefresh ?? new TaskAddToProjectViewModel();
+            var project = AccessPoint.Projects.First(p => p.Id == projectId);
+
+            model.ProjectId = projectId;
+            model.ProjectTitle = project.Name;
+            model.Statuses =
+                AccessPoint.ProjectStatuses.Select(
+                    p => new SelectListItem {Text = p.Name, Value = SqlFunctions.StringConvert((double) p.Id)}).
                     ToList();
 
-            ViewData["Users"] =
+            model.Programmers =
                 project.Team.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Working).Select(
                     u =>
                     new SelectListItem
-                    {
-                        Text = u.Username,
-                        Value = u.Id.ToString(),
-                    });
+                        {
+                            Text = u.Username,
+                            Value = u.Id.ToString(),
+                        });
+
+            return model;
         }
 
         [Authorize(Roles = "PM")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddToProject(int id, int userId, int statusId, Task t)
+        public ActionResult AddToProject(TaskAddToProjectViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                FillViewAddToProject(id);
-                return View();
+                if (model.ProjectId == 0)
+                {
+                    TempData["ErrorMessage"] = "Unable to detect target project";
+                    return RedirectToAction("List", "Projects");
+                }
+                model = CreateAddToProjectViewModel(model.ProjectId, model);
+                return View(model);
             }
             else
             {
-                var project = AccessPoint.Projects.First(p => p.Id == id);
+                ValidateAccessToProject(model.ProjectId);
+                var t = model.Task;
+                var project = AccessPoint.Projects.First(p => p.Id == model.ProjectId);
                 t.Project = project;
-                t.Status = AccessPoint.ProjectStatuses.First(s => s.Id == statusId);
-                t.Responsible = AccessPoint.Users.First(u => u.Id == userId);
+                t.Status = AccessPoint.ProjectStatuses.First(s => s.Id == model.StatusId);
+                t.Responsible = AccessPoint.Users.First(u => u.Id == model.ResponsibleUserId);
                 t.CreationDate = DateTime.Now;
                 project.Tasks.Add(t);
-
                 AccessPoint.SaveChanges();
-                return RedirectToAction("list", "Projects");
+
+                TempData["InformMessage"] = "Task created.";
+                return RedirectToAction("List", "Projects");
             }
         }
         //

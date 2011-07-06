@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.Domain.Task>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.ViewModels.TaskAddToProjectViewModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
 	Add task to project
@@ -6,9 +6,10 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Add task to "<%:ViewData["ProjectTitle"] %>"</h2>
+    <h2>Add task to "<%:Model.ProjectTitle %>"</h2>
 
     <% using (Html.BeginForm()) {%>
+        <%: Html.HiddenFor(model => model.ProjectId) %>
         <%: Html.AntiForgeryToken() %>
         <%: Html.ValidationSummary(true) %>
 
@@ -16,46 +17,46 @@
             <legend>Fields</legend>
                  
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Title) %>
+                <%: Html.LabelFor(model => model.Task.Title) %>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Title) %>
-                <%: Html.ValidationMessageFor(model => model.Title) %>
+                <%: Html.TextBoxFor(model => model.Task.Title)%>
+                <%: Html.ValidationMessageFor(model => model.Task.Title)%>
             </div>       
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Description) %>
+                <%: Html.LabelFor(model => model.Task.Description)%>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Description) %>
-                <%: Html.ValidationMessageFor(model => model.Description) %>
+                <%: Html.TextBoxFor(model => model.Task.Description)%>
+                <%: Html.ValidationMessageFor(model => model.Task.Description)%>
             </div>
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.BeginDate) %>
+                <%: Html.LabelFor(model => model.Task.BeginDate)%>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.BeginDate) %>
-                <%: Html.ValidationMessageFor(model => model.BeginDate) %>
+                <%: Html.TextBoxFor(model => model.Task.BeginDate)%>
+                <%: Html.ValidationMessageFor(model => model.Task.BeginDate)%>
             </div>
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.EndDate) %>
+                <%: Html.LabelFor(model => model.Task.EndDate)%>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.EndDate) %>
-                <%: Html.ValidationMessageFor(model => model.EndDate) %>
+                <%: Html.TextBoxFor(model => model.Task.EndDate)%>
+                <%: Html.ValidationMessageFor(model => model.Task.EndDate)%>
             </div>
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Status) %>
+                <%: Html.LabelFor(model => model.Task.Status) %>
             </div>
             <div class="editor-field">
-                <%: Html.DropDownList("statusId", (IEnumerable<SelectListItem>)ViewData["Statuses"]) %>
-                <%: Html.ValidationMessageFor(model => model.Status) %>
+                <%: Html.DropDownListFor(model => model.StatusId, Model.Statuses) %>
+                <%: Html.ValidationMessageFor(model => model.StatusId) %>
             </div>
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Responsible) %>
+                <%: Html.LabelFor(model => model.Task.Responsible)%>
             </div>
             <div class="editor-field">
-                <%: Html.DropDownList("userId", (IEnumerable<SelectListItem>)ViewData["Users"]) %>
-                <%: Html.ValidationMessageFor(model => model.Responsible) %>
+                <%: Html.DropDownListFor(model => model.ResponsibleUserId, Model.Programmers)%>
+                <%: Html.ValidationMessageFor(model => model.ResponsibleUserId) %>
             </div>
             <p>
                 <input type="submit" value="Create" />

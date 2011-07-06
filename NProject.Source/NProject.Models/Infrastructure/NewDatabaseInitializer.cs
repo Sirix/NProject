@@ -80,6 +80,8 @@ namespace NProject.Models.Infrastructure
                                    Name = "Develop a project management system",
                                    Customer = customer,
                                    CreationDate = DateTime.Now,
+                                   StartDate = DateTime.Now,
+                                   DeliveryDate = DateTime.Now.AddDays(1),
                                    Status = context.ProjectStatuses.First(),
                                    Team = new List<User> {m2}
                                };
@@ -102,6 +104,8 @@ namespace NProject.Models.Infrastructure
                                          Name = "Create a 3D game",
                                          Customer = customer,
                                          CreationDate = DateTime.Now,
+                                         StartDate = DateTime.Now,
+                                         DeliveryDate = DateTime.Now.AddDays(1),
                                          Status = context.ProjectStatuses.First(),
                                          Team = new List<User> {m1, p1},
                                          Tasks =

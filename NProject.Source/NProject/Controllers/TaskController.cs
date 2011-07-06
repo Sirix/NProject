@@ -269,7 +269,7 @@ namespace NProject.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Programmer")]
-        public ActionResult Complete(int id, int spentTime, int statusId)
+        public ActionResult Complete(int id, int statusId, int spentTime = 0)
         {
             CheckConditionsForCompleteTask(id);
             var task = AccessPoint.Tasks.First(t => t.Id == id);
@@ -282,7 +282,7 @@ namespace NProject.Controllers
                 return View(task);
             }
             //task.EstimatedTime = (task.EndDate - task.BeginDate);
-            task.EndDate = DateTime.Now;
+            //task.EndDate = DateTime.Now;
             task.SpentTime = spentTime;
             task.Status = AccessPoint.ProjectStatuses.First(p => p.Id == statusId);
             AccessPoint.SaveChanges();
@@ -290,6 +290,7 @@ namespace NProject.Controllers
             TempData["InformMessage"] = "Task has been updated.";
             return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
         }
+
         private void CheckConditionsForCompleteTask(int id)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);

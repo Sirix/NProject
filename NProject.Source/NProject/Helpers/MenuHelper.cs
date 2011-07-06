@@ -28,8 +28,8 @@ namespace NProject.Helpers
 
                     case "Customer":
                     case "PM":
-                        menu.AppendFormat("<li>{0}</li>",
-                                          helper.ActionLink("Meetings", "List", "Meeting").ToHtmlString());
+                        //menu.AppendFormat("<li>{0}</li>",
+                        //                  helper.ActionLink("Meetings", "List", "Meeting").ToHtmlString());
                         menu.AppendFormat("<li>{0}</li>",
                                           helper.ActionLink("Projects", "List", "Projects").ToHtmlString());
                         break;

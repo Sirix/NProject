@@ -49,7 +49,7 @@
                 <%:Html.ActionLink("View tasks", "Tasks", new {id = item.Id})%> |
                 <%
 }%>                <% if (Model.UserCanManageMeetings) { %> 
-                 | <%:Html.ActionLink("Meetings", "List", "Meeting", new {id = item.Id}, new object{})%>
+               <!--  | <%:Html.ActionLink("Meetings", "List", "Meeting", new {id = item.Id}, new object{})%> -->
                 <%
 }%>
                 <% if (Model.UserCanCreateAndDeleteProject) { %>  

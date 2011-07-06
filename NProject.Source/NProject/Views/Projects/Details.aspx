@@ -37,7 +37,11 @@
         
     </fieldset>
     <p>
-        <%: Html.ActionLink("Edit", "Edit", new {  id=Model.Id }) %> |
+        <% if ((bool)ViewData["ShowEditAction"])
+           {%>
+        <%:Html.ActionLink("Edit", "Edit", new {id = Model.Id})%> |
+        <%
+           }%>
         <%: Html.ActionLink("Back to List", "List") %>
     </p>
 

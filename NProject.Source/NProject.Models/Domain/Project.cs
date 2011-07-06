@@ -13,7 +13,7 @@ namespace NProject.Models.Domain
         public decimal TotalCost { get; set; }
         [Range(0, 100, ErrorMessage = "Progress must be in percents(0-100)")]
         public int Progress { get; set; }
-        [Range(0, 100, ErrorMessage = "Price discount must be in percents(0-100)")]
+        [Range(0, 100, ErrorMessage = "Price discount must be in percents(0...100)")]
         public double PriceDiscount { get; set; }
         public DateTime CreationDate { get; set; }
         [Required, DataType(DataType.Date)]

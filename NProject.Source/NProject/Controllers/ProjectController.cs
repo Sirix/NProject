@@ -182,6 +182,7 @@ namespace NProject.Controllers
             catch (ArgumentException)
             {
                 FillCreateEditForm();
+                ViewData["PageTitle"] = "Create";
                 return View();
             }
         }
@@ -258,6 +259,7 @@ namespace NProject.Controllers
             catch (ArgumentException)
             {
                 FillCreateEditForm();
+                ViewData["PageTitle"] = "Edit";
                 return View("Create", p);
             }
         }
@@ -371,7 +373,7 @@ namespace NProject.Controllers
             var project = GetProjectById(id);
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
             string role = user.Role.Name;
-
+            ViewData["ShowEditAction"] = role == "Director";
             switch (role)
             {
                 case "Director":

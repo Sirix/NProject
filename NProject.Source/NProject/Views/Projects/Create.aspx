@@ -9,8 +9,9 @@
     <h2><%: ViewData["PageTitle"] %></h2>
 
     <% using (Html.BeginForm()) {%>
-        <%: Html.ValidationSummary(true) %>
+        <%: Html.ValidationSummary() %>
         <%: Html.AntiForgeryToken() %>
+        <% if (Model != null)  %>
         <%: Html.HiddenFor(model=>model.Id) %>
         <fieldset>
             <legend>Fields</legend>

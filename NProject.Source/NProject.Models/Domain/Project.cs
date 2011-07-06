@@ -14,7 +14,9 @@ namespace NProject.Models.Domain
         public int Progress { get; set; }
         public double PriceDiscount { get; set; }
         public DateTime CreationDate { get; set; }
+        [Required, DataType(DataType.Date)]
         public DateTime? StartDate { get; set; }
+        [Required, DataType(DataType.Date)]
         public DateTime? DeliveryDate { get; set; }
 
         public virtual ICollection<Task> Tasks { get; set; }
@@ -29,7 +31,6 @@ namespace NProject.Models.Domain
             Team = new List<User>();
             CreationDate = DateTime.Now;
 // ReSharper restore DoNotCallOverridableMethodsInConstructor
-
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using NProject.Models.Infrastructure;
 
 namespace NProject.Models.Domain
 {
+    //[DataComparison("BeginDate", "EndDate", ErrorMessage = "Date of task completing must be later than begin date")]
     public class Task
     {
         public int Id { get; set; }

@@ -104,7 +104,7 @@ namespace NProject.Controllers
                 AccessPoint.SaveChanges();
 
                 TempData["InformMessage"] = "Task created.";
-                return RedirectToAction("List", "Projects");
+                return RedirectToAction("Tasks", "Projects", new {id = t.Project.Id});
             }
         }
         //

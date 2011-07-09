@@ -16,7 +16,7 @@
         <b><i>*You need rights to create database on the server</i></b>
      </p>
      <br /><br />
-     <h2>Our team</h2>
+     <h3>Special thanks for our team, which worked at version 1.0</h3>
      <ul>
         <li>Ivan Manzhos</li>
         <li>Sergey Smirnov</li>

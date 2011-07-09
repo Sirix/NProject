@@ -6,7 +6,7 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Project tasks</h2>
+    <h2>"<%:ViewData["ProjectTitle"] %>" tasks</h2>
      <p>
         <%: Html.ActionLink("Back to projects", "List")%>
     </p>

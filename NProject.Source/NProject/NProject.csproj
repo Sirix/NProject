@@ -105,6 +105,7 @@
     <Compile Include="Helpers\MenuHelper.cs" />
     <Compile Include="Infrastructure\Md5Helper.cs" />
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Helpers\ControllerExtension.cs" />
     <Compile Include="Models\MeetingsListViewModel.cs" />
     <Compile Include="Models\ProjectListViewModel.cs" />
     <Compile Include="Models\TaskAddToProjectViewModel.cs" />

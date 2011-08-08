@@ -18,16 +18,19 @@ namespace NProject.Controllers
         [Dependency]
         public IAccessPoint AccessPoint { get; set; }
 
+        private Project _project;
         /// <summary>
         /// Add task to project which specified by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles="PM")]
-        public ActionResult AddToProject(int id)
+        [Authorize(Roles = "PM")]
+        public ActionResult AddToProject(int id = 0)
         {
-            ValidateAccessToProject(id);
+            if (!ValidateAccessToProject(id)) return null;
+
             var model = CreateAddToProjectViewModel(id);
+            
             return View(model);
         }
 
@@ -35,15 +38,25 @@ namespace NProject.Controllers
         /// Validates currently logged user access to project, which specified by id.
         /// </summary>
         /// <param name="projectId">Project id</param>
-        private void ValidateAccessToProject(int projectId)
+        private bool ValidateAccessToProject(int projectId)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-            var project = AccessPoint.Projects.First(p => p.Id == projectId);
-            if (!project.Team.Contains(user))
+            _project = AccessPoint.Projects.FirstOrDefault(p => p.Id == projectId);
+
+            if (_project == null)
+            {
+                TempData["ErrorMessage"] = "Selected project does not exist.";
+                RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
+                return false;
+            }
+
+            if (!_project.Team.Contains(user))
             {
                 TempData["ErrorMessage"] = "You're not eligible to manage tasks of this project";
                 RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
+                return false;
             }
+            return true;
         }
 
         /// <summary>

@@ -1,63 +1,63 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.Domain.Task>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.ViewModels.TaskFormViewModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-	Edit
+	Edit task
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Edit task</h2>
+    <h2>Edit "<%:Model.Task.Title %>"</h2>
 
     <% using (Html.BeginForm()) {%>
-        <%: Html.ValidationSummary(true) %>
+        <%: Html.HiddenFor(model => model.ProjectId) %>
+        <%: Html.HiddenFor(model => model.Task.Id) %>
         <%: Html.AntiForgeryToken() %>
-        <%: Html.HiddenFor(model=>model.Id) %>
+        <%: Html.ValidationSummary() %>
+
         <fieldset>
             <legend>Fields</legend>
-
+                 
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Title) %>
+                <%: Html.LabelFor(model => model.Task.Title) %>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Title) %>
-                <%: Html.ValidationMessageFor(model => model.Title) %>
-            </div>                   
+                <%: Html.TextBoxFor(model => model.Task.Title)%>
+                <%: Html.ValidationMessageFor(model => model.Task.Title)%>
+            </div>       
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Description) %>
+                <%: Html.LabelFor(model => model.Task.Description)%>
             </div>
             <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.Description) %>
-                <%: Html.ValidationMessageFor(model => model.Description) %>
-            </div>
-                        
-            <div class="editor-label">
-                <%: Html.LabelFor(model => model.BeginDate) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.BeginDate, String.Format("{0:g}", Model.BeginDate)) %>
-                <%: Html.ValidationMessageFor(model => model.BeginDate) %>
-            </div>
-            
-            <div class="editor-label">
-                <%: Html.LabelFor(model => model.EndDate) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.TextBoxFor(model => model.EndDate, String.Format("{0:g}", Model.EndDate)) %>
-                <%: Html.ValidationMessageFor(model => model.EndDate) %>
-            </div>
-                        <div class="editor-label">
-                <%: Html.LabelFor(model => model.Status) %>
-            </div>
-            <div class="editor-field">
-                <%: Html.DropDownList("statusId", (IEnumerable<SelectListItem>)ViewData["Statuses"]) %>
-                <%: Html.ValidationMessageFor(model => model.Status) %>
+                <%: Html.TextBoxFor(model => model.Task.Description)%>
+                <%: Html.ValidationMessageFor(model => model.Task.Description)%>
             </div>
             <div class="editor-label">
-                <%: Html.LabelFor(model => model.Responsible) %>
+                <%: Html.LabelFor(model => model.Task.BeginDate)%>
             </div>
             <div class="editor-field">
-                <%: Html.DropDownList("responsibleId", (IEnumerable<SelectListItem>)ViewData["Users"]) %>
-                <%: Html.ValidationMessageFor(model => model.Responsible.Id) %>
+                <%: Html.TextBoxFor(model => model.Task.BeginDate)%>
+                <%: Html.ValidationMessageFor(model => model.Task.BeginDate)%>
+            </div>
+            <div class="editor-label">
+                <%: Html.LabelFor(model => model.Task.EndDate)%>
+            </div>
+            <div class="editor-field">
+                <%: Html.TextBoxFor(model => model.Task.EndDate)%>
+                <%: Html.ValidationMessageFor(model => model.Task.EndDate)%>
+            </div>
+            <div class="editor-label">
+                <%: Html.LabelFor(model => model.Task.Status) %>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownListFor(model => model.StatusId, Model.Statuses) %>
+                <%: Html.ValidationMessageFor(model => model.StatusId) %>
+            </div>
+            <div class="editor-label">
+                <%: Html.LabelFor(model => model.Task.Responsible)%>
+            </div>
+            <div class="editor-field">
+                <%: Html.DropDownListFor(model => model.ResponsibleUserId, Model.Programmers)%>
+                <%: Html.ValidationMessageFor(model => model.ResponsibleUserId) %>
             </div>
             <p>
                 <input type="submit" value="Save" />
@@ -67,7 +67,7 @@
     <% } %>
 
     <div>
-        <%: Html.ActionLink("Back to List", "Tasks", "Projects", new { id = ViewData["ProjectId"] }, new object())%>
+        <%: Html.ActionLink("Back to List", "Tasks", "Projects", new { id = Model.ProjectId }, new object())%>
     </div>
 
 </asp:Content>

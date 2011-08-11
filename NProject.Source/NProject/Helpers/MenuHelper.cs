@@ -51,4 +51,23 @@ namespace NProject.Helpers
             return MvcHtmlString.Create(menu.ToString());
         }
     }
+
+    public static class UIHelper
+    {
+        public static IEnumerable<SelectListItem> CreateSelectListFromEnum<TEnum>()
+        {
+            return UIHelper.CreateSelectListFromEnum(default(TEnum));
+        }
+        public static IEnumerable<SelectListItem> CreateSelectListFromEnum<TEnum>(TEnum selectedValue)
+        {
+            var values = Enum.GetValues(typeof(TEnum));
+            var names = Enum.GetNames(typeof(TEnum));
+            int i = 0;
+            var result = new List<SelectListItem>();
+            foreach (TEnum v in values)
+                result.Add(new SelectListItem { Text = names[i++], Value = i.ToString(), Selected = v.Equals(selectedValue) });
+
+            return result;
+        }
+    }
 }

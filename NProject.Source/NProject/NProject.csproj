@@ -108,7 +108,7 @@
     <Compile Include="Helpers\ControllerExtension.cs" />
     <Compile Include="Models\MeetingsListViewModel.cs" />
     <Compile Include="Models\ProjectListViewModel.cs" />
-    <Compile Include="Models\TaskAddToProjectViewModel.cs" />
+    <Compile Include="Models\TaskFormViewModel.cs" />
     <Compile Include="Models\EFMembershipService.cs" />
     <Compile Include="Models\EFRoleProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -166,7 +166,6 @@
     <Content Include="Views\Shared\Site.Master" />
     <Content Include="Views\Web.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>

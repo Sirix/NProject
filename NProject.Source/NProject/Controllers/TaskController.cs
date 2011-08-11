@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Practices.Unity;
+using NProject.Helpers;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
@@ -27,9 +28,10 @@ namespace NProject.Controllers
         [Authorize(Roles = "PM")]
         public ActionResult AddToProject(int id = 0)
         {
-            if (!ValidateAccessToProject(id)) return null;
+            var result = ValidateAccessToProject(id);
+            if (result != null) return result;
 
-            var model = CreateAddToProjectViewModel(id);
+            var model = GetTaskFormViewModel(id);
             
             return View(model);
         }
@@ -37,26 +39,26 @@ namespace NProject.Controllers
         /// <summary>
         /// Validates currently logged user access to project, which specified by id.
         /// </summary>
-        /// <param name="projectId">Project id</param>
-        private bool ValidateAccessToProject(int projectId)
+        /// <param name="id">Project id</param>
+        private ActionResult ValidateAccessToProject(int id)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-            _project = AccessPoint.Projects.FirstOrDefault(p => p.Id == projectId);
+            _project = AccessPoint.Projects.FirstOrDefault(p => p.Id == id);
 
             if (_project == null)
             {
                 TempData["ErrorMessage"] = "Selected project does not exist.";
-                RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
-                return false;
+                //RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
+                return RedirectToAction("List", "Projects");
             }
 
             if (!_project.Team.Contains(user))
             {
-                TempData["ErrorMessage"] = "You're not eligible to manage tasks of this project";
-                RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
-                return false;
+                TempData["ErrorMessage"] = "You're not eligible to manage tasks of this project.";
+                //RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
+                return RedirectToAction("List", "Projects");
             }
-            return true;
+            return null;
         }
 
         /// <summary>
@@ -65,17 +67,18 @@ namespace NProject.Controllers
         /// <param name="projectId">Target project id</param>
         /// <param name="modelToRefresh">If specified, view model will be refreshed instead of creating new</param>
         /// <returns></returns>
-        private TaskAddToProjectViewModel CreateAddToProjectViewModel(int projectId, TaskAddToProjectViewModel modelToRefresh = null)
+        private TaskFormViewModel GetTaskFormViewModel(int projectId, TaskFormViewModel modelToRefresh = null)
         {
-            var model = modelToRefresh ?? new TaskAddToProjectViewModel();
-            var project = AccessPoint.Projects.First(p => p.Id == projectId);
+            var model = modelToRefresh ?? new TaskFormViewModel();
+            var project = _project ?? AccessPoint.Projects.First(p => p.Id == projectId);
 
             model.ProjectId = projectId;
             model.ProjectTitle = project.Name;
-            model.Statuses =
-                AccessPoint.ProjectStatuses.Select(
-                    p => new SelectListItem {Text = p.Name, Value = SqlFunctions.StringConvert((double) p.Id)}).
-                    ToList();
+            model.Statuses = UIHelper.CreateSelectListFromEnum<ItemStatus>();
+
+                //AccessPoint.ProjectStatuses.Select(
+                //    p => new SelectListItem {Text = p.Name, Value = SqlFunctions.StringConvert((double) p.Id)}).
+                //    ToList();
 
             model.Programmers =
                 project.Team.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Working).Select(
@@ -92,33 +95,43 @@ namespace NProject.Controllers
         [Authorize(Roles = "PM")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddToProject(TaskAddToProjectViewModel model)
+        public ActionResult AddToProject(TaskFormViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                //if model has no info about target project, we can't refill it, so show error
                 if (model.ProjectId == 0)
                 {
-                    TempData["ErrorMessage"] = "Unable to detect target project";
+                    TempData["ErrorMessage"] = "Unable to detect target project.";
                     return RedirectToAction("List", "Projects");
                 }
-                model = CreateAddToProjectViewModel(model.ProjectId, model);
+                model = GetTaskFormViewModel(model.ProjectId, model);
                 return View(model);
             }
-            else
-            {
-                ValidateAccessToProject(model.ProjectId);
-                var t = model.Task;
-                var project = AccessPoint.Projects.First(p => p.Id == model.ProjectId);
-                t.Project = project;
-                t.Status = AccessPoint.ProjectStatuses.First(s => s.Id == model.StatusId);
-                t.Responsible = AccessPoint.Users.First(u => u.Id == model.ResponsibleUserId);
-                t.CreationDate = DateTime.Now;
-                project.Tasks.Add(t);
-                AccessPoint.SaveChanges();
+            var result = ValidateAccessToProject(model.ProjectId);
+            if (result != null) return result;
 
-                TempData["InformMessage"] = "Task created.";
-                return RedirectToAction("Tasks", "Projects", new {id = t.Project.Id});
+            var t = model.Task;
+            //_project already selected by ValidateAccessToProject
+            t.Project = _project;
+
+            t.Status = AccessPoint.ProjectStatuses.First(s => s.Id == model.StatusId);
+            //t.Status = (ItemStatus)model.StatusId;
+                
+            var responsible = AccessPoint.Users.FirstOrDefault(u => u.Id == model.ResponsibleUserId);
+            if (responsible == null)
+            {
+                TempData["ErrorMessage"] = "Unable to detect target responsible user.";
+                model = GetTaskFormViewModel(model.ProjectId, model);
+                return View(model);
             }
+            t.Responsible = responsible;
+            t.CreationDate = DateTime.Now;
+            _project.Tasks.Add(t);
+
+            AccessPoint.SaveChanges();
+            TempData["InformMessage"] = "Task created.";
+            return RedirectToAction("Tasks", "Projects", new {id = t.Project.Id});
         }
         //
         // GET: /Task/Edit/5
@@ -126,67 +139,61 @@ namespace NProject.Controllers
         [Authorize(Roles="PM")]
         public ActionResult Edit(int id)
         {
-            var task = AccessPoint.Tasks.First(i => i.Id == id);
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-            //if this is a pm of a project
-            if (!task.Project.Team.Contains(user))
+            var task = AccessPoint.Tasks.FirstOrDefault(i => i.Id == id);
+            if (task == null)
             {
-                TempData["ErrorMessage"] = "You're not eligible to modify this task.";
-                RedirectToAction("Tasks", "Projects", new { id = task.Project.Id }).ExecuteResult(ControllerContext);
+                TempData["ErrorMessage"] = "No task found.";
+                return RedirectToAction("List", "Projects");
             }
-
-            ViewData["Statuses"] =
-                AccessPoint.ProjectStatuses.Select(
-                    p =>
-                    new SelectListItem
-                        {
-                            Text = p.Name,
-                            Value = SqlFunctions.StringConvert((double) p.Id),
-                            Selected = task.Status.Name == p.Name
-                        }).
-                    ToList();
-
-            ViewData["Users"] =
-                task.Project.Team.Where(u => u.Role.Name == "Programmer").Select(
-                    u =>
-                    new SelectListItem
-                        {
-                            Text = u.Username,
-                            Value = u.Id.ToString(),
-                            Selected = u.Id == task.Responsible.Id
-                        });
-            ViewData["ProjectId"] = task.Project.Id;
-            return View(task);
-        }
-
-        //
-        // POST: /Task/Edit/5
-
-        [HttpPost]
-        [Authorize(Roles = "PM"), ValidateAntiForgeryToken]
-        public ActionResult Edit(Task t, int responsibleId, int statusId)
-        {
-            var task = AccessPoint.Tasks.First(i => i.Id == t.Id);
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
             //if this is a pm of a project
             if (!task.Project.Team.Contains(user))
             {
                 TempData["ErrorMessage"] = "You're not eligible to modify this task.";
                 return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
             }
-            //check for a new responsible user
-            var respUser = AccessPoint.Users.First(i => i.Id == responsibleId);
-            if (!task.Project.Team.Contains(respUser))
-            {
-                TempData["ErrorMessage"] = "Selected responsible user is not in this project's team.";
-                return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
-            }
+            var model = GetTaskFormViewModel(task.Project.Id);
+            model.Task = task;
+            model.Statuses.First(i => int.Parse(i.Value) == task.Status.Id).Selected = true;
+            model.Programmers.First(i => int.Parse(i.Value) == task.Responsible.Id).Selected = true;
 
+            return View(model);
+        }
+
+        //
+        // POST: /Task/Edit/5
+
+        [HttpPost]
+        [Authorize(Roles = "PM")]
+        //[ ValidateAntiForgeryToken]
+        public ActionResult Edit(TaskFormViewModel model)
+        {
             if (ModelState.IsValid)
             {
-                AccessPoint.ObjectContext.ApplyCurrentValues("Tasks", t);
+                var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+                var task = AccessPoint.Tasks.First(i => i.Id == model.Task.Id);
+                if (task == null)
+                {
+                    TempData["ErrorMessage"] = "No task found.";
+                    return RedirectToAction("List", "Projects");
+                }
+                //if current user not a pm of the project
+                if (!task.Project.Team.Contains(user))
+                {
+                    TempData["ErrorMessage"] = "You're not eligible to edit this task.";
+                    return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
+                }
+                //check for a new responsible user
+                var respUser = AccessPoint.Users.FirstOrDefault(i => i.Id == model.ResponsibleUserId);
+                if (respUser == null || !task.Project.Team.Contains(respUser))
+                {
+                    TempData["ErrorMessage"] = "Selected responsible user is not in this project's team.";
+                    return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
+                }
+
+                AccessPoint.ObjectContext.ApplyCurrentValues("Tasks", model.Task);
                 task.Responsible = respUser;
-                var status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
+                var status = AccessPoint.ProjectStatuses.First(i => i.Id == model.StatusId);
                 task.Status = status;
                 AccessPoint.SaveChanges();
 
@@ -195,27 +202,17 @@ namespace NProject.Controllers
             }
             else
             {
-                ViewData["Statuses"] =
-                    AccessPoint.ProjectStatuses.Select(
-                        p =>
-                        new SelectListItem
-                            {
-                                Text = p.Name,
-                                Value = SqlFunctions.StringConvert((double) p.Id),
-                                Selected = task.Status.Name == p.Name
-                            }).
-                        ToList();
+                //if model has no info about task, we can't refill it, so show error
+                if (model.Task.Id == 0)
+                {
+                    TempData["ErrorMessage"] = "Unable to detect target task.";
+                    return RedirectToAction("List", "Projects");
+                }
+                model = GetTaskFormViewModel(model.ProjectId, model);
+                model.Statuses.First(i => int.Parse(i.Value) == model.StatusId).Selected = true;
+                model.Programmers.First(i => int.Parse(i.Value) == model.ResponsibleUserId).Selected = true;
 
-                ViewData["Users"] =
-                    task.Project.Team.Where(u => u.Role.Name == "Programmer").Select(
-                        u =>
-                        new SelectListItem
-                            {
-                                Text = u.Username,
-                                Value = u.Id.ToString(),
-                                Selected = u.Id == task.Responsible.Id
-                            });
-                return View(t);
+                return View(model);
             }
         }
 

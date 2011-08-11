@@ -5,7 +5,7 @@ using NProject.Models.Domain;
 
 namespace NProject.Models.ViewModels
 {
-    public class TaskAddToProjectViewModel
+    public class TaskFormViewModel
     {
         [Required(ErrorMessage = "You must specify project id.")]
         [Range(1, int.MaxValue, ErrorMessage = "You must specify project.")]

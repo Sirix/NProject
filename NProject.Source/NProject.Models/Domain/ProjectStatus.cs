@@ -2,6 +2,7 @@
 
 namespace NProject.Models.Domain
 {
+    [System.Obsolete("Use enum NProject.Models.Domain.ItemStatus instead.")]
     public class ProjectStatus
     {
         public int Id { get; set; }
@@ -18,5 +19,12 @@ namespace NProject.Models.Domain
         {
             return Name;
         }
+    }
+    public enum ItemStatus
+    {
+        Created = 1,
+        Developing = 2,
+        Suspended = 3,
+        Finished = 4
     }
 }

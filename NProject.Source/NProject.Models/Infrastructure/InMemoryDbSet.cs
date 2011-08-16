@@ -17,6 +17,11 @@ namespace NProject.Models.Infrastructure
             _data = new HashSet<T>();
             _query = _data.AsQueryable();
         }
+        public InMemoryDbSet(params T[] values)
+        {
+            _data = new HashSet<T>(values);
+            _query = _data.AsQueryable();
+        }
 
         public T Add(T entity)
         {

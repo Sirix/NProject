@@ -96,14 +96,19 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MeetingController.cs" />
     <Compile Include="Controllers\ProjectController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\MenuHelper.cs" />
     <Compile Include="Infrastructure\Md5Helper.cs" />
     <Compile Include="Models\AccountModels.cs" />
-    <Compile Include="Models\TaskAddToProjectViewModel.cs" />
+    <Compile Include="Helpers\ControllerExtension.cs" />
+    <Compile Include="Models\MeetingsListViewModel.cs" />
+    <Compile Include="Models\ProjectListViewModel.cs" />
+    <Compile Include="Models\TaskFormViewModel.cs" />
     <Compile Include="Models\EFMembershipService.cs" />
     <Compile Include="Models\EFRoleProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -115,12 +120,19 @@
     <Content Include="Views\Account\Edit.aspx" />
     <Content Include="Views\Account\List.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
+    <Content Include="Views\Meeting\List.aspx" />
     <Content Include="Views\Projects\AddStaff.aspx" />
+    <Content Include="Views\Projects\Create.aspx" />
+    <Content Include="Views\Projects\Delete.aspx" />
+    <Content Include="Views\Projects\Details.aspx" />
     <Content Include="Views\Projects\Index.aspx" />
     <Content Include="Views\Projects\List.aspx" />
     <Content Include="Views\Projects\ProjectTasks.aspx" />
+    <Content Include="Views\Projects\RemoveStaff.aspx" />
     <Content Include="Views\Projects\Team.aspx" />
     <Content Include="Views\Task\AddToProject.aspx" />
+    <Content Include="Views\Task\Complete.aspx" />
+    <Content Include="Views\Task\Edit.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -154,7 +166,6 @@
     <Content Include="Views\Shared\Site.Master" />
     <Content Include="Views\Web.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>

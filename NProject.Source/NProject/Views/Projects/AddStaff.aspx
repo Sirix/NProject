@@ -10,8 +10,8 @@
         <% using (Html.BeginForm()) {%>
         <%: Html.AntiForgeryToken() %>
         <%: Html.ValidationSummary(true) %>
-
         <fieldset>
+        <% if (((IEnumerable<SelectListItem>)ViewData["Users"]).Count() > 0) {  %>
             <legend>Select staff and click "Add"</legend>
                         
             <div class="editor-label">
@@ -23,11 +23,14 @@
             <p>
                 <input type="submit" value="Add" />
             </p>
+        
+        <% } else {%>
+        Unfortunatelly, all programmers already take part in this project.
+        <% } %>
         </fieldset>
-
     <% } %>
 
     <div>
-        <%: Html.ActionLink("Cancel", "List", "Projects") %>
+        <%: Html.ActionLink("Back to team", "Team", new { id = ViewData["ProjectId"] })%>
     </div>
 </asp:Content>

@@ -6,11 +6,16 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>Project tasks</h2>
-
+    <h2>"<%:ViewData["ProjectTitle"] %>" tasks</h2>
+     <p>
+        <%: Html.ActionLink("Back to projects", "List")%>
+    </p>
     <table>
         <tr>
             <th></th>
+            <th>
+                Title
+            </th>
             <th>
                 Description
             </th>
@@ -26,15 +31,29 @@
             <th>
                 Responsible
             </th>
+            <th>
+                Status
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
     
         <tr>
             <td>
-                <%: Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) %> |
-                <%: Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ })%> |
-                <%: Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })%>
+            <% if((bool)ViewData["CanExecuteTask"])
+{%>
+                <%: Html.ActionLink("Start task", "Take", "Task", new {  id=item.Id }, new object()) %> |
+                <%: Html.ActionLink("Complete", "Complete", "Task", new {  id=item.Id }, new object()) %> |
+            <%
+}%>
+            <% if ((bool)ViewData["CanCreateTasks"])
+{%>
+                <%: Html.ActionLink("Edit", "Edit", "Task", new {  id=item.Id }, new object()) %>
+           <!--   |   <%: Html.ActionLink("Delete", "Delete", "Task",new {  id=item.Id }, new object()) %> -->
+            <%}%>
+            </td>
+            <td>
+                <%: item.Title %>
             </td>
             <td>
                 <%: item.Description %>
@@ -51,15 +70,21 @@
             <td>
                 <%: item.Responsible.Username %>
             </td>
+            <td>
+                <%: item.Status %>
+            </td>
         </tr>
     
     <% } %>
 
     </table>
-
+    <%if ((bool)ViewData["CanCreateTasks"])
+      {%>
     <p>
-        <%: Html.ActionLink("Add new task", "AddToProject", "Task", new { id = ViewData["ProjectId"] }, new object { })%>
+        <%:Html.ActionLink("Add new task", "AddToProject", "Task", new {id = ViewData["ProjectId"]},
+                                            new object {})%>
     </p>
-
+    <%
+      }%>
 </asp:Content>
 

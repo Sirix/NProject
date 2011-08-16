@@ -20,7 +20,10 @@ namespace NProject.Models.Infrastructure
         internal void Seed(T context)
         {
             SeedNeededToLaunchData(context);
-
+            SeedFakeData(context);
+        }
+        private void SeedFakeData(T context)
+        {
             context.Users.Add(new User
                                   {
                                       Username = "Director",
@@ -28,22 +31,35 @@ namespace NProject.Models.Infrastructure
                                       Hash = EncryptMD5("director"),
                                       Role = context.Roles.First(r => r.Name == "Director")
                                   });
-            var m =
-                new User
-                    {
-                        Username = "Manager",
-                        Email = "manager@nproject.com",
-                        Hash = EncryptMD5("manager"),
-                        Role = context.Roles.First(r => r.Name == "PM")
-                    };
-            context.Users.Add(m);
-            context.Users.Add(new User
-                                  {
-                                      Username = "Customer",
-                                      Email = "Customer@nproject.com",
-                                      Hash = EncryptMD5("customer"),
-                                      Role = context.Roles.First(r => r.Name == "Customer")
-                                  });
+            var m1 = new User
+                         {
+                             Username = "Manager",
+                             Email = "manager@nproject.com",
+                             Hash = EncryptMD5("manager"),
+                             Role = context.Roles.First(r => r.Name == "PM")
+                         };
+            var m2 = new User
+                         {
+                             Username = "Stiv",
+                             Email = "veryCoolPM@Stiv.com",
+                             Hash = EncryptMD5("Stiv"),
+                             Role = context.Roles.First(r => r.Name == "PM")
+                         };
+            var p1 = new User
+                         {
+                             Username = "Mark",
+                             Email = "coolProgrammer@nproject.com",
+                             Hash = EncryptMD5("Mark"),
+                             Role = context.Roles.First(r => r.Name == "Programmer")
+                         };
+            var customer = new User
+                               {
+                                   Username = "Customer",
+                                   Email = "Customer@nproject.com",
+                                   Hash = EncryptMD5("customer"),
+                                   Role = context.Roles.First(r => r.Name == "Customer")
+                               };
+
             context.Users.Add(new User
                                   {
                                       Username = "Programmer",
@@ -60,14 +76,49 @@ namespace NProject.Models.Infrastructure
                                       Role = context.Roles.First(r => r.Name == "Programmer")
                                   });
 
+            context.Users.Add(customer);
+            context.Users.Add(p1);
+            context.Users.Add(m1);
+            context.Users.Add(m2);
+            // context.SaveChanges();
+
+            var project1 = new Project
+                               {
+                                   Name = "Develop a project management system",
+                                   Customer = customer,
+                                   CreationDate = DateTime.Now,
+                                   StartDate = DateTime.Now,
+                                   DeliveryDate = DateTime.Now.AddDays(1),
+                                   Status = context.ProjectStatuses.First(),
+                                   Team = new List<User> {m2}
+                               };
+
+
+            context.Projects.Add(project1);
+            var task1 = new Task
+                            {
+                                Title = "Converter",
+                                Description = "Create texture convertor",
+                                Responsible = p1,
+                                CreationDate = DateTime.Now,
+                                BeginDate = DateTime.Now,
+                                EndDate = DateTime.Now.AddDays(1),
+                                Status = context.ProjectStatuses.First()
+                            };
+            context.Tasks.Add(task1);
             context.Projects.Add(new Project
                                      {
-                                         Name = "Develop a project management system",
-                                         Customer = context.Users.First(),
+                                         Name = "Create a 3D game",
+                                         Customer = customer,
                                          CreationDate = DateTime.Now,
+                                         StartDate = DateTime.Now,
+                                         DeliveryDate = DateTime.Now.AddDays(1),
                                          Status = context.ProjectStatuses.First(),
-                                         Team = new List<User> {m}
+                                         Team = new List<User> {m1, p1},
+                                         Tasks =
+                                             new List<Task> {task1}
                                      });
+
             context.SaveChanges();
         }
 
@@ -84,7 +135,8 @@ namespace NProject.Models.Infrastructure
 
             context.ProjectStatuses.Add(new ProjectStatus {Name = "Just Created", Id = 1}.AsBase());
             context.ProjectStatuses.Add(new ProjectStatus { Name = "Developing", Id = 2 }.AsBase());
-            context.ProjectStatuses.Add(new ProjectStatus { Name = "Finished", Id = 3 }.AsBase());
+            context.ProjectStatuses.Add(new ProjectStatus { Name = "Freezed", Id = 3 }.AsBase());
+            context.ProjectStatuses.Add(new ProjectStatus { Name = "Finished", Id = 4 }.AsBase());
 
             context.Users.Add(new User
                                   {

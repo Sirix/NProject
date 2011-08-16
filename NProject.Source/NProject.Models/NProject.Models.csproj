@@ -66,14 +66,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Meeting.cs" />
     <Compile Include="Domain\Project.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\ProjectStatus.cs" />
     <Compile Include="Domain\Task.cs" />
     <Compile Include="Domain\User.cs" />
+    <Compile Include="Infrastructure\DataComparisonAttribute.cs" />
     <Compile Include="Infrastructure\IAccessPoint.cs" />
     <Compile Include="Infrastructure\InMemoryDbSet.cs" />
     <Compile Include="Infrastructure\NewDatabaseInitializer.cs" />
+    <Compile Include="Infrastructure\UserState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

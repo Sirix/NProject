@@ -205,6 +205,18 @@ namespace NProject.Controllers
                 ViewData["Roles"] = roles;
                 ViewData["Username"] = user.Username;
 
+                //save user state enum to list
+                var values = Enum.GetValues(typeof (UserState));
+                var names = Enum.GetNames(typeof (UserState));
+                int i = 0;
+                var result = new List<SelectListItem>();
+                foreach (byte v in values)
+                {
+                    result.Add(new SelectListItem
+                                   {Text = names[i++], Value = v.ToString(), Selected = v == (byte) user.UserState});
+
+                }
+                ViewData["UserStates"] = result;
                 return View(user);
             }
         }
@@ -212,17 +224,18 @@ namespace NProject.Controllers
         [Authorize(Roles = "admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, int roleId)
+        public ActionResult Edit(int id, int roleId, int userStateId)
         {
             if (ModelState.IsValid)
             {
-                if(MembershipService.UpdateUserRole(id, roleId))
+                if(MembershipService.UpdateUser(id, roleId, userStateId))
                 {
+                    TempData["InformMessage"] = "User has been updated";
                     return RedirectToAction("List", "Account");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Incorrect role update");
+                    ModelState.AddModelError("", "Incorrect update");
                 }
             }
             var roles =
@@ -231,6 +244,17 @@ namespace NProject.Controllers
             var user = MembershipService.GetUserById(id);
             roles.First(r => r.Text == user.Role.Name).Selected = true;
             ViewData["Roles"] = roles;
+            //save user state enum to list
+            var values = Enum.GetValues(typeof(UserState));
+            var names = Enum.GetNames(typeof(UserState));
+            int i = 0;
+            var result = new List<SelectListItem>();
+            foreach (byte v in values)
+            {
+                result.Add(new SelectListItem { Text = names[i++], Value = v.ToString(), Selected = v == (byte)user.UserState });
+
+            }
+            ViewData["UserStates"] = result;
             ViewData["Username"] = user.Username;
             return View();
         }

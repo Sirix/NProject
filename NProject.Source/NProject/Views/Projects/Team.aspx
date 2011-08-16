@@ -11,6 +11,12 @@
     <h2>Team</h2>
     <table>
         <tr>
+        <% if ((bool)ViewData["CanManageTeam"])
+           {%>
+            <th>
+            </th>
+            <%
+           }%>
             <th>
                 Username
             </th>
@@ -20,11 +26,22 @@
             <th>
                 Role
             </th>
+             <th>
+                State
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
     
         <tr>
+         <% if ((bool)ViewData["CanManageTeam"])
+{%>
+            <td>
+                <%:Html.ActionLink("Remove from team", "RemoveStaff",
+                                      new {id = ViewData["ProjectId"], userId = item.Id})%>
+            </td>
+            <%
+}%>
             <td>
                 <%: item.Username %>
             </td>
@@ -34,6 +51,9 @@
             <td>
                 <%: item.Role.Name %>
             </td>
+            <td>
+                <%: item.UserState %>
+            </td>
         </tr>
     
     <% } %>
@@ -41,8 +61,8 @@
     </table>
 
     <p>
+    <%if ((bool)ViewData["CanManageTeam"])  %>
         <%: Html.ActionLink("Add staff", "AddStaff", new { id = ViewData["ProjectId"] })%>
     </p>
 
 </asp:Content>
-

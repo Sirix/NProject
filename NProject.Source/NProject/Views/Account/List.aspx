@@ -6,14 +6,11 @@
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 
-    <h2>List</h2>
+    <h2>User's list</h2>
 
     <table>
         <tr>
             <th></th>
-            <th>
-                Id
-            </th>
             <th>
                 Username
             </th>
@@ -23,17 +20,16 @@
             <th>
                 Role
             </th>
+            <th>
+                State
+            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
     
         <tr>
             <td>
-                <%: Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) %> |
-                <%: Html.ActionLink("Delete", "Delete", new { id = item.Id })%>
-            </td>
-            <td>
-                <%: item.Id %>
+                <%: Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) %>
             </td>
             <td>
                 <%: item.Username %>
@@ -43,6 +39,9 @@
             </td>
             <td>
                 <%: item.Role %>
+            </td>
+            <td>
+                <%: item.UserState %>
             </td>
         </tr>
     

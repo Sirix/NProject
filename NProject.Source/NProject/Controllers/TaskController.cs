@@ -165,7 +165,7 @@ namespace NProject.Controllers
 
         [HttpPost]
         [Authorize(Roles = "PM")]
-        //[ ValidateAntiForgeryToken]
+        [ ValidateAntiForgeryToken]
         public ActionResult Edit(TaskFormViewModel model)
         {
             if (ModelState.IsValid)
@@ -301,10 +301,10 @@ namespace NProject.Controllers
             return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
         }
 
-        private void CheckConditionsForCompleteTask(int id)
+        private void CheckConditionsForCompleteTask(int taskId)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-            var task = AccessPoint.Tasks.First(t => t.Id == id);
+            var task = AccessPoint.Tasks.First(t => t.Id == taskId);
             //check for user is responsible for this task
             if (task.Responsible.Id != user.Id)
             {

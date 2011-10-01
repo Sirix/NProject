@@ -27,7 +27,7 @@ namespace NProject.Models.Infrastructure
 
         static DbAccessPoint()
         {
-            Database.SetInitializer(new NewDatabaseInitializer<DbAccessPoint>());
+            Database.SetInitializer(new RecreateSchemaIfModelChanges<DbAccessPoint>());
         }
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -170,6 +170,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NProject.BLL\NProject.BLL.csproj">
+      <Project>{12278C88-D2E6-4397-BD6B-BD15FAF44D9C}</Project>
+      <Name>NProject.BLL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NProject.Models\NProject.Models.csproj">
       <Project>{43DB37C3-08F3-44C2-BF93-E3BC1FC0F6D5}</Project>
       <Name>NProject.Models</Name>

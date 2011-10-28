@@ -5,6 +5,17 @@ using NProject.Models.Infrastructure;
 
 namespace NProject.Models.Domain
 {
+    [Flags]
+    public enum UserRole
+    {
+        Unspecified = 0,
+        Programmer = 2,
+        Manager = 4,
+        TopManager = 8,
+        Customer = 16,
+        Tester = 32,
+        Admin = 64
+    }
     public class User
     {
         public int Id { get; set; }
@@ -23,9 +34,18 @@ namespace NProject.Models.Domain
         }
 
         [Obsolete("This property is used only by EF. Use UserState property instead.")]
-        public byte state { get; set; }
+        public byte state;
 
-        public virtual Role Role { get; set; }
+        [NotMapped]
+        public UserRole Role
+        {
+            get { return (UserRole)role; }
+            set { role = (byte)value; }
+        }
+
+        [Obsolete("This property is used only by EF. Use Role property instead.")]
+        public byte role;
+
         public virtual ICollection<Project> Projects { get; set; }
         public virtual ICollection<Meeting> Meetings { get; set; }
 

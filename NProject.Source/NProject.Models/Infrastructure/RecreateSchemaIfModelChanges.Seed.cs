@@ -22,35 +22,35 @@ namespace NProject.Models.Infrastructure
                 Username = "Director",
                 Email = "director@nproject.com",
                 Hash = EncryptMD5("director"),
-                Role = context.Roles.First(r => r.Name == "Director")
+                Role = UserRole.TopManager
             });
             var m1 = new User
             {
                 Username = "Manager",
                 Email = "manager@nproject.com",
                 Hash = EncryptMD5("manager"),
-                Role = context.Roles.First(r => r.Name == "PM")
+                Role = UserRole.Manager
             };
             var m2 = new User
             {
                 Username = "Stiv",
                 Email = "veryCoolPM@Stiv.com",
                 Hash = EncryptMD5("Stiv"),
-                Role = context.Roles.First(r => r.Name == "PM")
+                Role = UserRole.Manager
             };
             var p1 = new User
             {
                 Username = "Mark",
                 Email = "coolProgrammer@nproject.com",
                 Hash = EncryptMD5("Mark"),
-                Role = context.Roles.First(r => r.Name == "Programmer")
+                Role = UserRole.Programmer
             };
             var customer = new User
             {
                 Username = "Customer",
                 Email = "Customer@nproject.com",
                 Hash = EncryptMD5("customer"),
-                Role = context.Roles.First(r => r.Name == "Customer")
+                Role = UserRole.Customer
             };
 
             context.Users.Add(new User
@@ -58,7 +58,7 @@ namespace NProject.Models.Infrastructure
                 Username = "Programmer",
                 Email = "programmer@nproject.com",
                 Hash = EncryptMD5("programmer"),
-                Role = context.Roles.First(r => r.Name == "Programmer")
+                Role = UserRole.Programmer
             });
 
             context.Users.Add(new User
@@ -66,7 +66,7 @@ namespace NProject.Models.Infrastructure
                 Username = "Programmer2",
                 Email = "programmer2@nproject.com",
                 Hash = EncryptMD5("programmer2"),
-                Role = context.Roles.First(r => r.Name == "Programmer")
+                Role = UserRole.Programmer
             });
 
             context.Users.Add(customer);
@@ -117,14 +117,14 @@ namespace NProject.Models.Infrastructure
 
         internal void SeedNeededToLaunchData(T context)
         {
-            var roleAdmin =
-                new Role { Name = "Admin", Description = "get fully privilegies on user controlling", BaseLocation = "account/list" }.AsBase();
+            //var roleAdmin =
+            //    new Role { Name = "Admin", Description = "get fully privilegies on user controlling", BaseLocation = "account/list" }.AsBase();
 
-            context.Roles.Add(roleAdmin);
-            context.Roles.Add(new Role { Name = "PM", Description = "Project manager" }.AsBase());
-            context.Roles.Add(new Role { Name = "Director", Description = "Offce director" }.AsBase());
-            context.Roles.Add(new Role { Name = "Customer", Description = "Customer who wants to create an app" }.AsBase());
-            context.Roles.Add(new Role { Name = "Programmer", Description = "Works in the office" }.AsBase());
+            //context.Roles.Add(roleAdmin);
+            //context.Roles.Add(new Role { Name = "PM", Description = "Project manager" }.AsBase());
+            //context.Roles.Add(new Role { Name = "Director", Description = "Offce director" }.AsBase());
+            //context.Roles.Add(new Role { Name = "Customer", Description = "Customer who wants to create an app" }.AsBase());
+            //context.Roles.Add(new Role { Name = "Programmer", Description = "Works in the office" }.AsBase());
 
             context.ProjectStatuses.Add(new ProjectStatus { Name = "Just Created", Id = 1 }.AsBase());
             context.ProjectStatuses.Add(new ProjectStatus { Name = "Developing", Id = 2 }.AsBase());
@@ -136,7 +136,7 @@ namespace NProject.Models.Infrastructure
                 Username = "admin",
                 Email = "admin@nproject.com",
                 Hash = EncryptMD5("admin"),
-                Role = roleAdmin
+                Role = UserRole.Admin
             });
 
             context.SaveChanges();

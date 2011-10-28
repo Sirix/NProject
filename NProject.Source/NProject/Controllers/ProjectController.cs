@@ -6,10 +6,11 @@ using System.Web.Mvc;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
 using NProject.BLL;
-using NProject.Models;
+using NProject.Helpers;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 using System.Collections.Generic;
+using NProject.ViewModels;
 
 namespace NProject.Controllers
 {
@@ -27,8 +28,10 @@ namespace NProject.Controllers
         public ActionResult List()
         {
             var model = new ProjectListViewModel();
-            var projects = Repository.GetProjectListForUserByRole(User.Identity.Name);
+            int userId = SessionStorage.UserId;
             var role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
+            var projects = Repository.GetProjectListForUserByRole(userId);
+            
 
             switch (role)
             {
@@ -53,26 +56,26 @@ namespace NProject.Controllers
             return View(model);
         }
 
-        //
-        // GET: /Project/Tasks/5
-        [Authorize(Roles = "PM, Director, Programmer")]
-        public ActionResult Tasks(int id)
-        {
-            var project = Repository.GetProjectById(id);
-            ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
+        ////
+        //// GET: /Project/Tasks/5
+        //[Authorize(Roles = "PM, Director, Programmer")]
+        //public ActionResult Tasks(int id)
+        //{
+        //    var project = Repository.GetProjectById(id);
+        //    ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
 
-            var tasks = project.Tasks.ToList();
-            ViewData["ProjectId"] = id;
-            ViewData["ProjectTitle"] = project.Name;
-            ViewData["CanCreateTasks"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "PM";
-            ViewData["CanExecuteTask"] = AccessPoint.Users.First(i => i.Username == User.Identity.Name).Role.Name == "Programmer";
-            return View("ProjectTasks", tasks);
-        }
+        //    var tasks = project.Tasks.ToList();
+        //    ViewData["ProjectId"] = id;
+        //    ViewData["ProjectTitle"] = project.Name;
+        //    ViewData["CanCreateTasks"] = SessionStorage.UserRole == UserRole.Manager;
+        //    ViewData["CanExecuteTask"] = SessionStorage.UserRole == "Programmer";
+        //    return View("ProjectTasks", tasks);
+        //}
 
         private void ValidateAccessToProject(Project project, string role, string errorMessage)
         {
             var user = AccessPoint.Users.First(i => i.Username == User.Identity.Name);
-            if (!project.Team.Contains(user) && user.Role.Name != "Director")
+            if (!project.Team.Contains(user) && user.Role != UserRole.TopManager)
             {
                 TempData["ErrorMessage"] = errorMessage;
                 RedirectToAction("List").ExecuteResult(ControllerContext);
@@ -96,7 +99,7 @@ namespace NProject.Controllers
             ViewData["Users"] =
                 AccessPoint.Users.Where(
                     u =>
-                    u.Role.Name == "Programmer" &&
+                    u.Role == UserRole.Programmer &&
                     (u.state) == (byte)(UserState.Working) &&
                     !u.Projects.Select(i => i.Id).Contains(project.Id)).
                     Select(
@@ -114,10 +117,10 @@ namespace NProject.Controllers
             var project = Repository.GetProjectById(id);
             ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project.");
             var user = AccessPoint.Users.First(u => u.Id == userId);
-            if (user.Role.Name != "Programmer" || user.UserState != UserState.Working)
+            if (user.Role != UserRole.Programmer || user.UserState != UserState.Working)
             {
                 TempData["ErrorMessage"] = "You can add only working programmers to project.";
-                return RedirectToAction("Team", new { id = id });
+                return RedirectToAction("Team", new {id = id});
             }
 
             project.Team.Add(user);
@@ -150,14 +153,14 @@ namespace NProject.Controllers
                 if (!ModelState.IsValid) throw new ArgumentException();
 
                 var pmUser = AccessPoint.Users.First(i => i.Id == pmId);
-                if (pmUser.Role.Name != "PM")
+                if (pmUser.Role  != UserRole.Manager)
                 {
                     TempData["ErrorMessage"] = "You must select PM in PM field.";
                     throw new ArgumentException();
                     
                 }
                 var customUser = AccessPoint.Users.First(i => i.Id == customerId);
-                if (customUser.Role.Name != "Customer")
+                if (customUser.Role != UserRole.Customer)
                 {
                     TempData["ErrorMessage"] = "You must select customer in customer field.";
                     throw new ArgumentException();
@@ -182,10 +185,10 @@ namespace NProject.Controllers
         private void FillCreateEditForm()
         {
             ViewData["PM"] =
-              AccessPoint.Users.Where(u => u.Role.Name == "PM").Select(
+              AccessPoint.Users.Where(u => u.Role== UserRole.Manager).Select(
                   u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
             ViewData["Customer"] =
-                AccessPoint.Users.Where(u => u.Role.Name == "Customer").Select(
+                AccessPoint.Users.Where(u => u.Role== UserRole.Customer).Select(
                     u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
             ViewData["Statuses"] =
                AccessPoint.ProjectStatuses.Select(
@@ -200,7 +203,7 @@ namespace NProject.Controllers
             var project = Repository.GetProjectById(id);
             ViewData["PageTitle"] = "Edit";
             FillCreateEditForm();
-            (ViewData["PM"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Team.First(u => u.Role.Name == "PM").Username).
+            (ViewData["PM"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Team.First(u => u.Role== UserRole.Manager).Username).
                 Selected = true;
             (ViewData["Customer"] as IEnumerable<SelectListItem>).First(i => i.Text == project.Customer.Username).
                 Selected = true;
@@ -223,14 +226,14 @@ namespace NProject.Controllers
                 if (!ModelState.IsValid) throw new ArgumentException();
 
                 var pmUser = AccessPoint.Users.First(i => i.Id == pmId);
-                if (pmUser.Role.Name != "PM")
+                if (pmUser.Role != UserRole.Manager)
                 {
                     TempData["ErrorMessage"] = "You must select PM in PM field.";
                     throw new ArgumentException();
 
                 }
                 var customUser = AccessPoint.Users.First(i => i.Id == customerId);
-                if (customUser.Role.Name != "Customer")
+                if (customUser.Role != UserRole.Customer)
                 {
                     TempData["ErrorMessage"] = "You must select customer in customer field.";
                     throw new ArgumentException();
@@ -239,7 +242,7 @@ namespace NProject.Controllers
                 p.Status = AccessPoint.ProjectStatuses.First(i => i.Id == statusId);
                 p.Team = project.Team;
                 p.Tasks = project.Tasks;
-                p.Team.Remove(p.Team.First(u => u.Role.Name == "PM"));
+                p.Team.Remove(p.Team.First(u => u.Role== UserRole.Manager));
                 p.Team.Add(pmUser);
                 p.Customer = customUser;
                 AccessPoint.ObjectContext.ApplyCurrentValues("Projects", p);
@@ -296,9 +299,9 @@ namespace NProject.Controllers
             ValidateAccessToProject(project, "PM", "You are not eligible to view team of this project");
 
             ViewData["ProjectId"] = id;
-            ViewData["CanManageTeam"] = AccessPoint.Users.First(u => u.Username == User.Identity.Name).Role.Name ==
-            "PM";
-            return View(project.Team.OrderBy(u => u.Role.Name).ToList());
+            ViewData["CanManageTeam"] = SessionStorage.UserRole == UserRole.Manager;
+
+            return View(project.Team.OrderBy(u => u.Role).ToList());
         }
         private void CheckRemoveStaffConditions(Project project, User user)
         {
@@ -308,7 +311,7 @@ namespace NProject.Controllers
                     "This user is not in the team of this project, so you can't remove himself from project team.";
                 RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
             }
-            if (user.Role.Name == "PM")
+            if (user.Role== UserRole.Manager)
             {
                 TempData["ErrorMessage"] = "You can't remove yourself from project team.";
                 RedirectToAction("Team", new { id = project.Id }).ExecuteResult(ControllerContext);
@@ -363,21 +366,21 @@ namespace NProject.Controllers
         public ActionResult Details(int id)
         {
             var project = Repository.GetProjectById(id);
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-            string role = user.Role.Name;
-            ViewData["ShowEditAction"] = role == "Director";
+            var user = AccessPoint.Users.First(u => u.Id == SessionStorage.UserId);
+            var role = SessionStorage.UserRole;
+            ViewData["ShowEditAction"] = role == UserRole.TopManager;
             switch (role)
             {
-                case "Director":
+                case UserRole.TopManager:
                     return View(project);
 
-                case "Customer":
+                case UserRole.Customer:
                     if (project.Customer.Id == user.Id)
                         return View(project);
                     break;
 
-                case "PM":
-                case "Programmer":
+                case UserRole.Manager:
+                case UserRole.Programmer:
                     if (project.Team.Contains(user))
                         return View(project);
                     break;

@@ -74,7 +74,7 @@ namespace NProject.Models
 
         [Required]
         [DisplayName("Role")]
-        public int RoleId { get; set; }
+        public UserRole Role { get; set; }
     }
     #endregion
 
@@ -89,13 +89,13 @@ namespace NProject.Models
         int MinPasswordLength { get; }
 
         bool ValidateUser(string userName, string password);
-        MembershipCreateStatus CreateUser(string userName, string password, string email, int roleId);
+        MembershipCreateStatus CreateUser(string userName, string password, string email, UserRole role);
         bool ChangePassword(string userName, string oldPassword, string newPassword);
 
         ICollection<User> GetUsersList(int page, int itemsPerPage, out int total);
         User GetUserById(int userId);
 
-        bool UpdateUser(int id, int roleId, int stateId);
+        bool UpdateUser(int id, UserRole roleId, int stateId);
     }
 
     public class AccountMembershipService : IMembershipService
@@ -132,12 +132,12 @@ namespace NProject.Models
             return _provider.ValidateUser(userName, password);
         }
 
-        public MembershipCreateStatus CreateUser(string userName, string password, string email, int roleId)
+        public MembershipCreateStatus CreateUser(string userName, string password, string email, UserRole role)
         {
             if (String.IsNullOrEmpty(userName)) throw new ArgumentException("Value cannot be null or empty.", "userName");
             if (String.IsNullOrEmpty(password)) throw new ArgumentException("Value cannot be null or empty.", "password");
             if (String.IsNullOrEmpty(email)) throw new ArgumentException("Value cannot be null or empty.", "email");
-            if (roleId <= 0) throw new ArgumentException("Role identificator must be greater than zero.", "roleId");
+            if (role <= 0) throw new ArgumentException("Role identificator must be greater than zero.", "role");
 
             //create user
             MembershipCreateStatus status;
@@ -146,7 +146,7 @@ namespace NProject.Models
 
             //set role
             var user = AccessPoint.Users.First(u => u.Username == userName);
-            user.Role = AccessPoint.Roles.First(r => r.Id == roleId);
+            user.Role = role;
             AccessPoint.SaveChanges();
 
             return status;
@@ -186,19 +186,19 @@ namespace NProject.Models
             return _provider.GetUserById(userId);
         }
 
-        public bool UpdateUser(int id, int roleId, int stateId)
+        public bool UpdateUser(int id, UserRole roleId, int stateId)
         {
             var user = AccessPoint.Users.First(u => u.Id == id);
-            var role = AccessPoint.Roles.First(r => r.Id == roleId);
 
-            int currentUserRoleId = user.Role.Id;
+
+            var currentUserRoleId = user.Role;
 
             //only one user remains with this role
-            if (AccessPoint.Users.Count(u => u.Role.Id == currentUserRoleId) == 1)
+            if (AccessPoint.Users.Count(u => u.Role == currentUserRoleId) == 1)
             {
                 return false;
             }
-            user.Role = role;
+            user.Role = roleId;
             user.UserState = (UserState) stateId;
 
             AccessPoint.SaveChanges();

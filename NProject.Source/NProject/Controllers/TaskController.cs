@@ -5,17 +5,23 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Practices.Unity;
+using NProject.BLL;
 using NProject.Helpers;
+using NProject.Infrastructure;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 using NProject.Models.ViewModels;
+using NProject.ViewModels;
 
 namespace NProject.Controllers
 {
     [HandleError]
     public class TaskController : Controller
     {
+        [Dependency]
+        public TaskService TaskService { get; set; }
+
         [Dependency]
         public IAccessPoint AccessPoint { get; set; }
 
@@ -35,6 +41,23 @@ namespace NProject.Controllers
             
             return View(model);
         }
+        //[Authorize(Roles="PM")]
+        [AuthorizedToRoles(AllowedRoles=UserRole.Manager|UserRole.Programmer)]
+        public ActionResult AtProject(int id)
+        {
+            var tasks = TaskService.GetTasksForProject(id);
+            var vm = new TaskListViewModel {Tasks = tasks};
+
+            var project = (new ProjectsRepository(){AccessPoint = AccessPoint}).GetProjectById(id);
+            //ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
+
+            ViewData["ProjectId"] = id;
+            ViewData["ProjectTitle"] = project.Name;
+            ViewData["CanCreateTasks"] = SessionStorage.UserRole == UserRole.Manager;
+            ViewData["CanExecuteTask"] = SessionStorage.UserRole == UserRole.Programmer;
+            return View(vm);
+        }
+
 
         /// <summary>
         /// Validates currently logged user access to project, which specified by id.
@@ -81,7 +104,7 @@ namespace NProject.Controllers
                 //    ToList();
 
             model.Programmers =
-                project.Team.Where(u => u.Role.Name == "Programmer" && u.UserState == UserState.Working).Select(
+                project.Team.Where(u => u.Role == UserRole.Programmer && u.UserState == UserState.Working).Select(
                     u =>
                     new SelectListItem
                         {

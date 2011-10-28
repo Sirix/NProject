@@ -11,7 +11,6 @@ namespace NProject.Models.Infrastructure
         IDbSet<Task> Tasks { get; set; }
         IDbSet<User> Users { get; set; }
         IDbSet<ProjectStatus> ProjectStatuses { get; set; }
-        IDbSet<Role> Roles { get; set; }
 
         int SaveChanges();
     }
@@ -23,7 +22,6 @@ namespace NProject.Models.Infrastructure
         public IDbSet<Task> Tasks { get; set; }
         public IDbSet<User> Users { get; set; }
         public IDbSet<ProjectStatus> ProjectStatuses { get; set; }
-        public IDbSet<Role> Roles { get; set; }
 
         static DbAccessPoint()
         {

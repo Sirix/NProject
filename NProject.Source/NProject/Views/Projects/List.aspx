@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.Models.ProjectListViewModel>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<NProject.ViewModels.ProjectListViewModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
 	<%: Model.TableTitle %>
@@ -46,10 +46,10 @@
                 <% if (!Model.UserIsCustomer)
 {%>
                 <%:Html.ActionLink("View team", "Team", new {id = item.Id})%> | 
-                <%:Html.ActionLink("View tasks", "Tasks", new {id = item.Id})%> |
+                <%:Html.ActionLink("View tasks", "AtProject", "Task", new { id = item.Id }, new object())%> |
                 <%
 }%>                <% if (Model.UserCanManageMeetings) { %> 
-               <!--  | <%:Html.ActionLink("Meetings", "List", "Meeting", new {id = item.Id}, new object{})%> -->
+               <!--  | <%:Html.ActionLink("Meetings", "List", "Meeting", new {id = item.Id}, new object())%> -->
                 <%
 }%>
                 <% if (Model.UserCanCreateAndDeleteProject) { %>  

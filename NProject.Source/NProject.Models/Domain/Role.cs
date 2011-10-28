@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NProject.Models.Domain
 {
+    [Obsolete("Use UserRole enum instead", true)]
     public class Role
     {
         public int Id { get; set; }

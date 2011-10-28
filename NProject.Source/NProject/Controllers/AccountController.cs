@@ -11,7 +11,9 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
+using NProject.Helpers;
 using NProject.Models;
+using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 
 namespace NProject.Controllers
@@ -43,7 +45,7 @@ namespace NProject.Controllers
             if(Request.IsAuthenticated)
                 return RedirectToAction("index", "home");
 
-            return View();
+            return View(new LogOnModel {UserName = "manager", Password = "manager"});
         }
 
         [HttpPost]
@@ -92,10 +94,8 @@ namespace NProject.Controllers
         public ActionResult Register()
         {
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
-            var roles =
-                AccessPoint.Roles.Select(
-                    r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).
-                    ToList();
+            var roles = UIHelper.CreateSelectListFromEnum<UserRole>();
+
             ViewData["Roles"] = roles;
 
             return View();
@@ -108,7 +108,7 @@ namespace NProject.Controllers
             if (ModelState.IsValid)
             {
                 // Attempt to register the user
-                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email, model.RoleId);
+                MembershipCreateStatus createStatus = MembershipService.CreateUser(model.UserName, model.Password, model.Email, model.Role);
 
                 if (createStatus == MembershipCreateStatus.Success)
                 {
@@ -121,10 +121,8 @@ namespace NProject.Controllers
             }
 
             // If we got this far, something failed, redisplay form
-            var roles =
-                AccessPoint.Roles.Select(
-                    r => new SelectListItem { Text = r.Name, Value = SqlFunctions.StringConvert((double)r.Id) }).
-                    ToList();
+            var roles = UIHelper.CreateSelectListFromEnum<UserRole>();
+
             ViewData["Roles"] = roles;
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
 
@@ -196,12 +194,9 @@ namespace NProject.Controllers
             }
             else
             {
-                var roles =
-                    AccessPoint.Roles.Select(
-                        r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).
-                        ToList();
                 var user = MembershipService.GetUserById(id);
-                roles.First(r => r.Text == user.Role.Name).Selected = true;
+                var roles = UIHelper.CreateSelectListFromEnum<UserRole>(user.Role);
+
                 ViewData["Roles"] = roles;
                 ViewData["Username"] = user.Username;
 
@@ -224,7 +219,7 @@ namespace NProject.Controllers
         [Authorize(Roles = "admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, int roleId, int userStateId)
+        public ActionResult Edit(int id, UserRole roleId, int userStateId)
         {
             if (ModelState.IsValid)
             {
@@ -238,11 +233,8 @@ namespace NProject.Controllers
                     ModelState.AddModelError("", "Incorrect update");
                 }
             }
-            var roles =
-                AccessPoint.Roles.Select(
-                    r => new SelectListItem {Text = r.Name, Value = SqlFunctions.StringConvert((double) r.Id)}).ToList();
             var user = MembershipService.GetUserById(id);
-            roles.First(r => r.Text == user.Role.Name).Selected = true;
+            var roles = UIHelper.CreateSelectListFromEnum(user.Role);
             ViewData["Roles"] = roles;
             //save user state enum to list
             var values = Enum.GetValues(typeof(UserState));

@@ -81,11 +81,11 @@ namespace NProject.NUnit.TestCollection.Controllers
             taskController.ControllerContext = TestHelper.InstantiateControllerContext("Manager");
 
             var db = new Mock<IAccessPoint>();
-            var programmerRole = new Role {Name = "Programmer", Id = 1};
-            var managerRole = new Role { Name = "Manager", Id = 2 };
-            var manager = new User {Username = "Manager", Id = 1, Role = managerRole};
-            var programmer = new User {Username = "Programmer", Id = 1, Role = programmerRole};
-            var programmer2 = new User { Username = "Other Programmer", Id = 2, Role = programmerRole };
+           // var programmerRole = new Role {Name = "Programmer", Id = 1};
+           // var managerRole = new Role { Name = "Manager", Id = 2 };
+            var manager = new User {Username = "Manager", Id = 1, Role = UserRole.Manager};
+            var programmer = new User {Username = "Programmer", Id = 1, Role = UserRole.Programmer};
+            var programmer2 = new User { Username = "Other Programmer", Id = 2, Role = UserRole.Programmer };
             var project = new Project
                               {
                                   Id = 1,
@@ -93,7 +93,7 @@ namespace NProject.NUnit.TestCollection.Controllers
                                   Name = "Some test project."
                               };
 
-            db.SetupGet(x => x.Roles).Returns(new InMemoryDbSet<Role>(programmerRole, managerRole));
+            //db.SetupGet(x => x.Roles).Returns(new InMemoryDbSet<Role>(programmerRole, managerRole));
             db.SetupGet(x => x.Users).Returns(new InMemoryDbSet<User>(manager, programmer, programmer2));
             db.SetupGet(x => x.Projects).Returns(
                 new InMemoryDbSet<Project>(project));

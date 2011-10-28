@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Security;
 using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
+using NProject.Helpers;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 
@@ -142,7 +143,15 @@ namespace NProject.Models
         public override bool ValidateUser(string username, string password)
         {
             string hash = MD5.EncryptMD5(password);
-            return AccessPoint.Users.Any(u => u.Username == username && u.Hash == hash);
+            var user = AccessPoint.Users.SingleOrDefault(u => u.Username == username && u.Hash == hash);
+            if (user != null)
+            {
+                SessionStorage.UserId = user.Id;
+                SessionStorage.UserRole = user.Role;
+                return true;
+            }
+            else
+                return false;
         }
 
         /// <summary>
@@ -223,7 +232,7 @@ namespace NProject.Models
             totalRecords = AccessPoint.Users.Count();
             // becouse on firstpage must be first 20 users and so on..
             pageIndex = pageIndex - 1;
-            return AccessPoint.Users.OrderBy(u => u.Role.Id).Skip(pageIndex*pageSize).Take(pageSize).ToList();
+            return AccessPoint.Users.OrderBy(u => u.Role).Skip(pageIndex*pageSize).Take(pageSize).ToList();
         }
 
         /// <summary>

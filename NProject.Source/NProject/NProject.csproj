@@ -103,17 +103,21 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\MenuHelper.cs" />
+    <Compile Include="Helpers\SessionStorage.cs" />
+    <Compile Include="Infrastructure\AuthorizedToRolesAttribute.cs" />
     <Compile Include="Infrastructure\Md5Helper.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Helpers\ControllerExtension.cs" />
     <Compile Include="Models\MeetingsListViewModel.cs" />
-    <Compile Include="Models\ProjectListViewModel.cs" />
+    <Compile Include="ViewModels\ProjectListViewModel.cs" />
     <Compile Include="Models\TaskFormViewModel.cs" />
     <Compile Include="Models\EFMembershipService.cs" />
     <Compile Include="Models\EFRoleProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\UnityControllerFactory.cs" />
     <Compile Include="Services\TaskService.cs" />
+    <Compile Include="ViewModels\SiteMasterViewModel.cs" />
+    <Compile Include="ViewModels\TaskListViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
@@ -133,6 +137,7 @@
     <Content Include="Views\Task\AddToProject.aspx" />
     <Content Include="Views\Task\Complete.aspx" />
     <Content Include="Views\Task\Edit.aspx" />
+    <Content Include="Views\Task\AtProject.aspx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

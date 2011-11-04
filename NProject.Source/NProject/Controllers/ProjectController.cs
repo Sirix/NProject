@@ -7,6 +7,7 @@ using System.Web.Security;
 using Microsoft.Practices.Unity;
 using NProject.BLL;
 using NProject.Helpers;
+using NProject.Infrastructure;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
 using System.Collections.Generic;
@@ -17,60 +18,46 @@ namespace NProject.Controllers
     [HandleError]
     public class ProjectsController : Controller
     {
-        [Dependency]
-        public IProjectsRepository Repository { get; set; }
+        private ProjectsRepository Repository { get; set; }
         [Dependency]
         public IAccessPoint AccessPoint { get; set; }
 
+        public ProjectsController()
+        {
+            Repository = new ProjectsRepository();       
+        }
         //
         // GET: /Projects/
-        [Authorize(Roles = "PM, Director, Customer, Programmer")]
+        [AuthorizedToRoles(AllowedRoles = UserRole.Manager | UserRole.TopManager | UserRole.Customer | UserRole.Programmer)]
         public ActionResult List()
         {
             var model = new ProjectListViewModel();
             int userId = SessionStorage.UserId;
-            var role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
+            var role = SessionStorage.UserRole;
             var projects = Repository.GetProjectListForUserByRole(userId);
-            
 
             switch (role)
             {
-                case "Director":
+                case UserRole.TopManager:
                     model.TableTitle = "All company's projects";
                     break;
 
-                case "Customer":
+                case UserRole.Customer:
                     model.TableTitle = "All your projects";
                     break;
 
-                case "PM":
-                case "Programmer":
+                case UserRole.Manager:
+                case UserRole.Programmer:
                     model.TableTitle = "Projects in which you're involved";
                     break;
             }
             model.Projects = projects;
-            model.UserCanCreateAndDeleteProject = role == "Director";
-            model.UserIsCustomer = role == "Customer";
-            model.UserCanManageMeetings = role == "PM";
+            model.UserCanCreateAndDeleteProject = role == UserRole.TopManager;
+            model.UserIsCustomer = role == UserRole.Customer;
+            model.UserCanManageMeetings = role == UserRole.Manager;
 
             return View(model);
         }
-
-        ////
-        //// GET: /Project/Tasks/5
-        //[Authorize(Roles = "PM, Director, Programmer")]
-        //public ActionResult Tasks(int id)
-        //{
-        //    var project = Repository.GetProjectById(id);
-        //    ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
-
-        //    var tasks = project.Tasks.ToList();
-        //    ViewData["ProjectId"] = id;
-        //    ViewData["ProjectTitle"] = project.Name;
-        //    ViewData["CanCreateTasks"] = SessionStorage.UserRole == UserRole.Manager;
-        //    ViewData["CanExecuteTask"] = SessionStorage.UserRole == "Programmer";
-        //    return View("ProjectTasks", tasks);
-        //}
 
         private void ValidateAccessToProject(Project project, string role, string errorMessage)
         {
@@ -133,7 +120,7 @@ namespace NProject.Controllers
         //
         // GET: /Project/Create
 
-        [Authorize(Roles = "Director")]
+        [AuthorizedToRoles(AllowedRoles = UserRole.TopManager)]
         public ActionResult Create()
         {
             FillCreateEditForm();
@@ -145,7 +132,7 @@ namespace NProject.Controllers
         // POST: /Project/Create
 
         [HttpPost]
-        [Authorize(Roles = "Director")]
+        [AuthorizedToRoles(AllowedRoles = UserRole.TopManager)]
         public ActionResult Create(int statusId, int pmId, int customerId, Project p)
         {
             try

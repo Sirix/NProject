@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Security;
+using Microsoft.Practices.ServiceLocation;
 using Microsoft.Practices.Unity;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
@@ -18,8 +19,12 @@ namespace NProject.BLL
 
     public class ProjectsRepository : IProjectsRepository
     {
-        [Dependency]
-        public IAccessPoint AccessPoint { get; set; }
+        private IAccessPoint AccessPoint { get; set; }
+
+        public ProjectsRepository()
+        {
+            this.AccessPoint = ServiceLocator.Current.GetInstance<IAccessPoint>();
+        }
 
         public IEnumerable<Project> GetProjectListForUserByRole(int userId)
         {

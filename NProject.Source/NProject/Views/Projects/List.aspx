@@ -75,7 +75,7 @@
                 <%:item.Status%>
             </td>
             <% if (Model.UserCanCreateAndDeleteProject) { %>  
-                  <td><%: item.Team.First(i=>i.Role.Name=="PM").Username%></td>
+                  <td><%: item.Team.First(i=>i.Role == NProject.Models.Domain.UserRole.Manager).Username%></td>
                 <%  }%>
         </tr>
     

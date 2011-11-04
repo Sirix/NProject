@@ -12,6 +12,7 @@ using System.Web.Routing;
 using System.Web.Security;
 using Microsoft.Practices.Unity;
 using NProject.Helpers;
+using NProject.BLL;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
@@ -21,6 +22,8 @@ namespace NProject.Controllers
     [HandleError]
     public class AccountController : Controller
     {
+        public UserService UserService { get; set; }
+
         public IFormsAuthenticationService FormsService { get; set; }
 
         [Dependency]
@@ -32,6 +35,7 @@ namespace NProject.Controllers
         protected override void Initialize(RequestContext requestContext)
         {
             if (FormsService == null) { FormsService = new FormsAuthenticationService(); }
+            if (UserService == null) UserService = new UserService();
 
             base.Initialize(requestContext);
         }
@@ -53,16 +57,21 @@ namespace NProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (MembershipService.ValidateUser(model.UserName, model.Password))
+                var user = UserService.GetUserByCredentials(model.UserName, model.Password);
+                if (user != null)
                 {
                     FormsService.SignIn(model.UserName, model.RememberMe);
+                    SessionStorage.UserId = user.Id;
+                    SessionStorage.UserRole = user.Role;
+
                     if (!String.IsNullOrEmpty(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
                     else
                     {
-                        return RedirectToAction("index", "home");
+                        var loc = UserService.GetDefaultLocationByRole(user.Role).Split('/');
+                        return RedirectToAction(loc[1], loc[0]);
                     }
                 }
                 else

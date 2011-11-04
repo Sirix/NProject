@@ -42,13 +42,13 @@ namespace NProject.Controllers
             return View(model);
         }
         //[Authorize(Roles="PM")]
-        [AuthorizedToRoles(AllowedRoles=UserRole.Manager|UserRole.Programmer)]
+        [AuthorizedToRoles(AllowedRoles = UserRole.Manager | UserRole.Programmer)]
         public ActionResult AtProject(int id)
         {
             var tasks = TaskService.GetTasksForProject(id);
             var vm = new TaskListViewModel {Tasks = tasks};
 
-            var project = (new ProjectsRepository(){AccessPoint = AccessPoint}).GetProjectById(id);
+            var project = (new ProjectsRepository()).GetProjectById(id);
             //ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
 
             ViewData["ProjectId"] = id;

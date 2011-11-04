@@ -24,11 +24,11 @@ namespace NProject.Helpers
             get { return (UserRole)HttpContext.Current.Session["UserRole"]; }
             set { HttpContext.Current.Session["UserRole"] = value; }
         }
-        private static void CheckSession()
-        {
-            //if(SessionId == 0)
-            FormsAuthentication.SignOut();
-            FormsAuthentication.RedirectToLoginPage();
-        }
+        //private static void CheckSession()
+        //{
+        //    //if(SessionId == 0)
+        //    FormsAuthentication.SignOut();
+        //    FormsAuthentication.RedirectToLoginPage();
+        //}
     }
 }

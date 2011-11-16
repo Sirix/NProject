@@ -34,17 +34,20 @@ namespace NProject.Models.Domain
         }
 
         [Obsolete("This property is used only by EF. Use UserState property instead.")]
-        public byte state;
+        public int state;
 
         [NotMapped]
         public UserRole Role
         {
+#pragma warning disable 612,618
             get { return (UserRole)role; }
             set { role = (byte)value; }
+#pragma warning restore 612,618
         }
 
         [Obsolete("This property is used only by EF. Use Role property instead.")]
-        public byte role;
+        [Column("Role")]
+        public int role { get; set; }
 
         public virtual ICollection<Project> Projects { get; set; }
         public virtual ICollection<Meeting> Meetings { get; set; }

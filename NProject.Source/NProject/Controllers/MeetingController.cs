@@ -34,7 +34,7 @@ namespace NProject.Controllers
                     break;
 
                 case "PM":
-                    User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.role == (byte)UserRole.Manager);
+                    User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role == UserRole.Manager);
                     meetings = AccessPoint.Meeting.ToList().Where(p => p.Members.Contains(manager)).ToList();
                     model.TableTitle = "All meetings you are member of";
                     break;

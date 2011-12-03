@@ -123,6 +123,7 @@
     <Content Include="Global.asax" />
     <Content Include="Views\Account\Edit.aspx" />
     <Content Include="Views\Account\List.aspx" />
+    <Content Include="Views\Shared\AccessError.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
     <Content Include="Views\Meeting\List.aspx" />
     <Content Include="Views\Projects\AddStaff.aspx" />

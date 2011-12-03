@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Security;
+using NProject.Models.Domain;
 
 namespace NProject.Helpers
 {
@@ -17,29 +18,29 @@ namespace NProject.Helpers
             try
             {
                 string user = helper.ViewContext.HttpContext.User.Identity.Name;
-                string role = Roles.Provider.GetRolesForUser(user)[0];
+                var role = SessionStorage.UserRole;
 
                 switch (role)
                 {
-                    case "Director":
+                    case UserRole.TopManager:
                         menu.AppendFormat("<li>{0}</li>",
                                           helper.ActionLink("Projects", "List", "Projects").ToHtmlString());
                         break;
 
-                    case "Customer":
-                    case "PM":
+                    case UserRole.Customer:
+                    case UserRole.Manager:
                         //menu.AppendFormat("<li>{0}</li>",
                         //                  helper.ActionLink("Meetings", "List", "Meeting").ToHtmlString());
                         menu.AppendFormat("<li>{0}</li>",
                                           helper.ActionLink("Projects", "List", "Projects").ToHtmlString());
                         break;
 
-                    case "Programmer":
+                    case UserRole.Programmer:
                         menu.AppendFormat("<li>{0}</li>",
                                           helper.ActionLink("Projects", "List", "Projects").ToHtmlString());
                         break;
 
-                    case "Admin":
+                    case UserRole.Admin:
                         menu.AppendFormat("<li>{0}</li>",
                                           helper.ActionLink("Users", "List", "Account").ToHtmlString());
                         break;

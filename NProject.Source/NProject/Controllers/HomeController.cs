@@ -1,6 +1,8 @@
 ﻿using System.Web.Mvc;
 using System.Web.Security;
+using NProject.Infrastructure;
 using NProject.Models;
+using NProject.Models.Domain;
 
 namespace NProject.Controllers
 {
@@ -22,6 +24,12 @@ namespace NProject.Controllers
         public ActionResult About()
         {
             return View();
+        }
+
+        [AuthorizedToRoles(AllowedRoles = UserRole.Manager)]
+        public JsonResult TestManagerAction()
+        {
+            return new JsonResult() {Data = "123", JsonRequestBehavior = JsonRequestBehavior.AllowGet};
         }
     }
 }

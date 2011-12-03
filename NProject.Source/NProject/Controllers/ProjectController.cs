@@ -172,10 +172,10 @@ namespace NProject.Controllers
         private void FillCreateEditForm()
         {
             ViewData["PM"] =
-              AccessPoint.Users.Where(u => u.Role== UserRole.Manager).Select(
+              AccessPoint.Users.Where(u => u.role== (int)UserRole.Manager).Select(
                   u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
             ViewData["Customer"] =
-                AccessPoint.Users.Where(u => u.Role== UserRole.Customer).Select(
+                AccessPoint.Users.Where(u => u.role == (int)UserRole.Customer).Select(
                     u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).ToList();
             ViewData["Statuses"] =
                AccessPoint.ProjectStatuses.Select(
@@ -184,7 +184,7 @@ namespace NProject.Controllers
         //
         // GET: /Project/Edit/5
 
-        [Authorize(Roles="Director")]
+        [AuthorizedToRoles(AllowedRoles=UserRole.TopManager)]
         public ActionResult Edit(int id)
         {
             var project = Repository.GetProjectById(id);
@@ -202,7 +202,7 @@ namespace NProject.Controllers
 
         //
         // POST: /Project/Edit/5
-        [Authorize(Roles = "Director")]
+        [AuthorizedToRoles(AllowedRoles=UserRole.TopManager)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int statusId, int pmId, int customerId, Project p)
@@ -232,6 +232,7 @@ namespace NProject.Controllers
                 p.Team.Remove(p.Team.First(u => u.Role== UserRole.Manager));
                 p.Team.Add(pmUser);
                 p.Customer = customUser;
+                var pref = AccessPoint.Projects.First(pr => pr.Id == p.Id);
                 AccessPoint.ObjectContext.ApplyCurrentValues("Projects", p);
                 AccessPoint.SaveChanges();
 

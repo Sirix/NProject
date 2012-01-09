@@ -146,8 +146,8 @@ namespace NProject.Models
             var user = AccessPoint.Users.SingleOrDefault(u => u.Username == username && u.Hash == hash);
             if (user != null)
             {
-                SessionStorage.UserId = user.Id;
-                SessionStorage.UserRole = user.Role;
+                SessionStorage.User.Id = user.Id;
+                SessionStorage.User.Role = user.Role;
                 return true;
             }
             else

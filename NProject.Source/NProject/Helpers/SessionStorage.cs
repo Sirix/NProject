@@ -7,11 +7,13 @@ using NProject.Models.Domain;
 
 namespace NProject.Helpers
 {
+    [Serializable]
     internal class UserSessionInfo
     {
         public int Id { get; set; }
         public UserRole Role { get; set; }
     }
+
     internal static class SessionStorage
     {
         public static UserSessionInfo User

@@ -57,12 +57,11 @@ namespace NProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = UserService.GetUserByCredentials(model.UserName, model.Password);
+                var user = UserService.GetUser(model.UserName, model.Password);
                 if (user != null)
                 {
                     FormsService.SignIn(model.UserName, model.RememberMe);
-                    SessionStorage.UserId = user.Id;
-                    SessionStorage.UserRole = user.Role;
+                    SessionStorage.User = new UserSessionInfo {Id = user.Id, Role = user.Role};
 
                     if (!String.IsNullOrEmpty(returnUrl))
                     {
@@ -70,7 +69,7 @@ namespace NProject.Controllers
                     }
                     else
                     {
-                        var loc = UserService.GetDefaultLocationByRole(user.Role).Split('/');
+                        var loc = UserService.GetDefaultLocationForRole(user.Role).Split('/');
                         return RedirectToAction(loc[1], loc[0]);
                     }
                 }

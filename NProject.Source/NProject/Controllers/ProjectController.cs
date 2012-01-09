@@ -32,8 +32,8 @@ namespace NProject.Controllers
         public ActionResult List()
         {
             var model = new ProjectListViewModel();
-            int userId = SessionStorage.UserId;
-            var role = SessionStorage.UserRole;
+            int userId = SessionStorage.User.Id;
+            var role = SessionStorage.User.Role;
             var projects = Repository.GetProjectListForUserByRole(userId);
 
             switch (role)
@@ -287,7 +287,7 @@ namespace NProject.Controllers
             ValidateAccessToProject(project, "PM", "You are not eligible to view team of this project");
 
             ViewData["ProjectId"] = id;
-            ViewData["CanManageTeam"] = SessionStorage.UserRole == UserRole.Manager;
+            ViewData["CanManageTeam"] = SessionStorage.User.Role == UserRole.Manager;
 
             return View(project.Team.OrderBy(u => u.Role).ToList());
         }
@@ -354,8 +354,8 @@ namespace NProject.Controllers
         public ActionResult Details(int id)
         {
             var project = Repository.GetProjectById(id);
-            var user = AccessPoint.Users.First(u => u.Id == SessionStorage.UserId);
-            var role = SessionStorage.UserRole;
+            var user = AccessPoint.Users.First(u => u.Id == SessionStorage.User.Id);
+            var role = SessionStorage.User.Role;
             ViewData["ShowEditAction"] = role == UserRole.TopManager;
             switch (role)
             {

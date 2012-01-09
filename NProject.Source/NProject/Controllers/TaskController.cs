@@ -53,8 +53,8 @@ namespace NProject.Controllers
 
             ViewData["ProjectId"] = id;
             ViewData["ProjectTitle"] = project.Name;
-            ViewData["CanCreateTasks"] = SessionStorage.UserRole == UserRole.Manager;
-            ViewData["CanExecuteTask"] = SessionStorage.UserRole == UserRole.Programmer;
+            ViewData["CanCreateTasks"] = SessionStorage.User.Role == UserRole.Manager;
+            ViewData["CanExecuteTask"] = SessionStorage.User.Role == UserRole.Programmer;
             return View(vm);
         }
 

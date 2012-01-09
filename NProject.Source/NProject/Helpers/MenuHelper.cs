@@ -18,7 +18,7 @@ namespace NProject.Helpers
             try
             {
                 string user = helper.ViewContext.HttpContext.User.Identity.Name;
-                var role = SessionStorage.UserRole;
+                var role = SessionStorage.User.Role;
 
                 switch (role)
                 {

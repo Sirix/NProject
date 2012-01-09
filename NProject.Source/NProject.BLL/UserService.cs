@@ -9,15 +9,9 @@ using NProject.Models.Infrastructure;
 
 namespace NProject.BLL
 {
-    public interface IUserService
+    public class UserService : BaseService
     {
-        string GetDefaultLocationByRole(UserRole role);
-        User GetUserById(int id);
-    }
-
-    public class UserService : BaseService, IUserService
-    {
-        public string GetDefaultLocationByRole(UserRole role)
+        public string GetDefaultLocationForRole(UserRole role)
         {
             switch (role)
             {
@@ -41,11 +35,17 @@ namespace NProject.BLL
             }
             return null;
         }
-        public User GetUserById(int id)
+
+        /// <summary>
+        /// Retrieves the user instance from the database by passed id.
+        /// </summary>
+        /// <param name="userId">User id</param>
+        /// <returns>User instance, if exists; otherwise, null</returns>
+        public User GetUser(int userId)
         {
-            return Database.Users.FirstOrDefault(u => u.Id == id);
+            return Database.Users.FirstOrDefault(u => u.Id == userId);
         }
-        public User GetUserByCredentials(string username, string password)
+        public User GetUser(string username, string password)
         {
             string hash = MD5.EncryptMD5(password);
             return Database.Users.FirstOrDefault(u => u.Username == username && u.Hash == hash);

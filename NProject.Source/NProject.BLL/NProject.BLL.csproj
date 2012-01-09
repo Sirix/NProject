@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseService.cs" />
     <Compile Include="Md5Helper.cs" />
     <Compile Include="ProjectsManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,15 +15,8 @@ namespace NProject.BLL
         User GetUserById(int id);
     }
 
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
-        private IAccessPoint AccessPoint { get; set; }
-
-        public UserService()
-        {
-            AccessPoint = ServiceLocator.Current.GetInstance<IAccessPoint>();
-        }
-
         public string GetDefaultLocationByRole(UserRole role)
         {
             switch (role)
@@ -50,12 +43,12 @@ namespace NProject.BLL
         }
         public User GetUserById(int id)
         {
-            return AccessPoint.Users.FirstOrDefault(u => u.Id == id);
+            return Database.Users.FirstOrDefault(u => u.Id == id);
         }
         public User GetUserByCredentials(string username, string password)
         {
             string hash = MD5.EncryptMD5(password);
-            return AccessPoint.Users.FirstOrDefault(u => u.Username == username && u.Hash == hash);
+            return Database.Users.FirstOrDefault(u => u.Username == username && u.Hash == hash);
         }
     }
 }

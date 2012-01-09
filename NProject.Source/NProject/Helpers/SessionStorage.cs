@@ -7,28 +7,30 @@ using NProject.Models.Domain;
 
 namespace NProject.Helpers
 {
-    public static class SessionStorage
+    internal class UserSessionInfo
     {
-        static SessionStorage()
+        public int Id { get; set; }
+        public UserRole Role { get; set; }
+    }
+    internal static class SessionStorage
+    {
+        public static UserSessionInfo User
         {
-            SessionId = (new Random().Next(1, 1000));
+            get { return HttpContext.Current.Session["UserSessionInfo"] as UserSessionInfo; }
+            set { HttpContext.Current.Session["UserSessionInfo"] = value; }
         }
-        private static int SessionId;
+
+        [Obsolete]
         public static int UserId
         {
             get { return (int)HttpContext.Current.Session["UserId"]; }
             set { HttpContext.Current.Session["UserId"] = value; }
         }
+        [Obsolete]
         public static UserRole UserRole
         {
             get { return (UserRole)HttpContext.Current.Session["UserRole"]; }
             set { HttpContext.Current.Session["UserRole"] = value; }
         }
-        //private static void CheckSession()
-        //{
-        //    //if(SessionId == 0)
-        //    FormsAuthentication.SignOut();
-        //    FormsAuthentication.RedirectToLoginPage();
-        //}
     }
 }

@@ -31,7 +31,7 @@ namespace NProject.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         public ActionResult AddToProject(int id = 0)
         {
             var result = ValidateAccessToProject(id);
@@ -115,7 +115,7 @@ namespace NProject.Controllers
             return model;
         }
 
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AddToProject(TaskFormViewModel model)
@@ -158,8 +158,8 @@ namespace NProject.Controllers
         }
         //
         // GET: /Task/Edit/5
- 
-        [Authorize(Roles="PM")]
+
+        [AuthorizedToRoles(UserRole.Manager)]
         public ActionResult Edit(int id)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
@@ -187,7 +187,7 @@ namespace NProject.Controllers
         // POST: /Task/Edit/5
 
         [HttpPost]
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         [ ValidateAntiForgeryToken]
         public ActionResult Edit(TaskFormViewModel model)
         {
@@ -265,7 +265,7 @@ namespace NProject.Controllers
             }
         }
 
-        [Authorize(Roles = "Programmer")]
+        [AuthorizedToRoles(UserRole.Programmer)]
         public ActionResult Take(int id)
         {
             var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
@@ -288,7 +288,7 @@ namespace NProject.Controllers
             return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
         }
 
-        [Authorize(Roles = "Programmer")]
+        [AuthorizedToRoles(UserRole.Programmer)]
         public ActionResult Complete(int id)
         {
             CheckConditionsForCompleteTask(id);
@@ -301,7 +301,7 @@ namespace NProject.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Programmer")]
+        [AuthorizedToRoles(UserRole.Programmer)]
         public ActionResult Complete(int id, int statusId, int spentTime = 0)
         {
             CheckConditionsForCompleteTask(id);

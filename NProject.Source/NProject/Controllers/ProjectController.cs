@@ -28,7 +28,7 @@ namespace NProject.Controllers
         }
         //
         // GET: /Projects/
-        [AuthorizedToRoles(AllowedRoles = UserRole.Manager | UserRole.TopManager | UserRole.Customer | UserRole.Programmer)]
+        [AuthorizedToRoles(UserRole.Manager | UserRole.TopManager | UserRole.Customer | UserRole.Programmer)]
         public ActionResult List()
         {
             var model = new ProjectListViewModel();
@@ -61,20 +61,20 @@ namespace NProject.Controllers
 
         private void ValidateAccessToProject(Project project, string role, string errorMessage)
         {
-            var user = AccessPoint.Users.First(i => i.Username == User.Identity.Name);
-            if (!project.Team.Contains(user) && user.Role != UserRole.TopManager)
+            if (SessionStorage.User.Role != UserRole.TopManager &&
+                !project.Team.Select(u => u.Id).Contains(SessionStorage.User.Id))
             {
                 TempData["ErrorMessage"] = errorMessage;
                 RedirectToAction("List").ExecuteResult(ControllerContext);
             }
         }
-        
+
         /// <summary>
         /// Output form for add staff to project team
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">Project id</param>
         /// <returns></returns>
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         public ActionResult AddStaff(int id)
         {
             ViewData["ProjectId"] = id;
@@ -83,20 +83,17 @@ namespace NProject.Controllers
             ValidateAccessToProject(project, "PM", "You are not eligible to manage staff of this project");
 
             //get active programmers
-            ViewData["Users"] =
+            ViewData["Users"] = new SelectList(
                 AccessPoint.Users.Where(
-                    u =>
-                    u.Role == UserRole.Programmer &&
-                    (u.state) == (byte)(UserState.Working) &&
-                    !u.Projects.Select(i => i.Id).Contains(project.Id)).
-                    Select(
-                        u => new SelectListItem { Text = u.Username, Value = SqlFunctions.StringConvert((double)u.Id) }).
-                    ToList();
+                u =>
+                u.role == (int) UserRole.Programmer &&
+                //u.state == (int) (UserState.Working) &&
+                !u.Projects.Select(i => i.Id).Contains(project.Id)).ToList(), "Id", "Username");
 
             return View();
         }
 
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         [ValidateAntiForgeryToken]
         [HttpPost]
         public ActionResult AddStaff(int id, int userId)
@@ -280,7 +277,7 @@ namespace NProject.Controllers
         /// </summary>
         /// <param name="id">Project id</param>
         /// <returns></returns>
-        [Authorize(Roles = "PM, Director, Programmer")]
+        [AuthorizedToRoles(UserRole.TopManager | UserRole.Manager | UserRole.Programmer)]
         public ActionResult Team(int id)
         {
             var project = Repository.GetProjectById(id);
@@ -291,6 +288,7 @@ namespace NProject.Controllers
 
             return View(project.Team.OrderBy(u => u.Role).ToList());
         }
+
         private void CheckRemoveStaffConditions(Project project, User user)
         {
             if (!project.Team.Contains(user))
@@ -317,7 +315,7 @@ namespace NProject.Controllers
         /// <param name="id">Project id</param>
         /// <param name="userId">user id</param>
         /// <returns></returns>
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         public ActionResult RemoveStaff(int id, int userId)
         {
             var project = Repository.GetProjectById(id);
@@ -332,7 +330,7 @@ namespace NProject.Controllers
             return View();
         }
 
-        [Authorize(Roles = "PM")]
+        [AuthorizedToRoles(UserRole.Manager)]
         [ValidateAntiForgeryToken]
         [HttpPost]
         public ActionResult RemoveStaff(int id, int userId, FormCollection values)
@@ -350,7 +348,7 @@ namespace NProject.Controllers
             return RedirectToAction("Team", new { id = project.Id });
         }
 
-        [Authorize(Roles = "PM, Director, Customer, Programmer")]
+        [AuthorizedToRoles]
         public ActionResult Details(int id)
         {
             var project = Repository.GetProjectById(id);

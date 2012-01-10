@@ -49,7 +49,7 @@
                 <%: item.Email %>
             </td>
             <td>
-                <%: item.Role.Name %>
+                <%: item.Role %>
             </td>
             <td>
                 <%: item.UserState %>

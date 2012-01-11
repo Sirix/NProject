@@ -10,7 +10,8 @@
 <% using (Html.BeginForm("SimpleRegistrationFinish", "Account"))
    {%>
    	<%:Html.ValidationSummary()%>
-    <% Html.EnableClientValidation(); %>
+    <% Html.EnableClientValidation(true); %>
+    <% Html.EnableUnobtrusiveJavaScript(true); %>
 	<%:Html.AntiForgeryToken()%>
 	<%:Html.LabelFor(m => m.Email)%>:  <%:Html.EditorFor(m => m.Email)%> <%:Html.ValidationMessageFor(m=>m.Email) %><br />
 	<%:Html.LabelFor(m => m.Name)%>:  <%:Html.EditorFor(m => m.Name)%> <%:Html.ValidationMessageFor(m=>m.Name) %><br />

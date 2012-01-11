@@ -37,10 +37,10 @@ namespace NProject.Helpers
                                           helper.ActionLink("Projects", "List", "Projects").ToHtmlString());
                         break;
 
-                    case UserRole.Admin:
-                        menu.AppendFormat("<li>{0}</li>",
-                                          helper.ActionLink("Users", "List", "Account").ToHtmlString());
-                        break;
+                    //case UserRole.Admin:
+                    //    menu.AppendFormat("<li>{0}</li>",
+                    //                      helper.ActionLink("Users", "List", "Account").ToHtmlString());
+                    //    break;
                 }
             }
             catch { }

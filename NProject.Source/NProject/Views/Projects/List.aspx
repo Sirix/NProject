@@ -16,12 +16,6 @@
                 Name
             </th>
             <th>
-                TotalCost
-            </th>
-            <th>
-                Progress
-            </th>
-            <th>
                 CreationDate
             </th>
             <th>
@@ -60,12 +54,6 @@
                 <%:item.Name%>
             </td>
             <td>
-                <%:String.Format("{0:F}", item.TotalCost)%>
-            </td>
-            <td>
-                <%:item.Progress%>
-            </td>
-            <td>
                 <%:String.Format("{0:g}", item.CreationDate)%>
             </td>
             <td>
@@ -75,7 +63,7 @@
                 <%:item.Status%>
             </td>
             <% if (Model.UserCanCreateAndDeleteProject) { %>  
-                  <td><%: item.Team.First(i=>i.Role == NProject.Models.Domain.UserRole.Manager).Username%></td>
+                  <td><%: item.Team.First(i=>i.Role == NProject.Models.Domain.UserRole.Manager).User.Name%></td>
                 <%  }%>
         </tr>
     

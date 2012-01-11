@@ -13,38 +13,38 @@ namespace NProject.Controllers
     [HandleError]
     public class MeetingController : Controller
     {
-        [Dependency]
-        public IAccessPoint AccessPoint { get; set; }
+        //[Dependency]
+        //public IAccessPoint AccessPoint { get; set; }
 
-        // GET: /Meeting/List
+        //// GET: /Meeting/List
 
-        [Authorize]
-        public ActionResult List()
-        {
-            var model = new MeetingsListViewModel();
-            var meetings = Enumerable.Empty<Meeting>();
-            var role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
+        //[Authorize]
+        //public ActionResult List()
+        //{
+        //    var model = new MeetingsListViewModel();
+        //    var meetings = Enumerable.Empty<Meeting>();
+        //    var role = Roles.Provider.GetRolesForUser(User.Identity.Name)[0];
 
-            switch (role)
-            {
-                case "Customer":
-                    var customer = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
-                    meetings = AccessPoint.Meeting.Where(p => p.Organizer.Id == customer.Id).ToList();
-                    model.TableTitle = "All your meetings";
-                    break;
+        //    switch (role)
+        //    {
+        //        case "Customer":
+        //            var customer = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
+        //            meetings = AccessPoint.Meeting.Where(p => p.Organizer.Id == customer.Id).ToList();
+        //            model.TableTitle = "All your meetings";
+        //            break;
 
-                case "PM":
-                    User manager = AccessPoint.Users.First(u => u.Username == User.Identity.Name && u.Role == UserRole.Manager);
-                    meetings = AccessPoint.Meeting.ToList().Where(p => p.Members.Contains(manager)).ToList();
-                    model.TableTitle = "All meetings you are member of";
-                    break;
-            }
-            model.Meetings = meetings;
-            model.UserCanCreateAndDeleteMeeting = role == "Customer";
-            model.UserCanManageMeetings = (role == "Customer" || role == "PM");
+        //        case "PM":
+        //            User manager = AccessPoint.Users.First(u => u.Name == User.Identity.Name && u.Role == UserRole.Manager);
+        //            meetings = AccessPoint.Meeting.ToList().Where(p => p.Members.Contains(manager)).ToList();
+        //            model.TableTitle = "All meetings you are member of";
+        //            break;
+        //    }
+        //    model.Meetings = meetings;
+        //    model.UserCanCreateAndDeleteMeeting = role == "Customer";
+        //    model.UserCanManageMeetings = (role == "Customer" || role == "PM");
 
-            return View(model);
-        }
+        //    return View(model);
+        //}
 
     }
 }

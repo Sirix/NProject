@@ -3,7 +3,7 @@ using NProject.Models.Infrastructure;
 
 namespace NProject.BLL
 {
-    public class BaseService
+    public abstract class BaseService
     {
         protected IAccessPoint Database { get; set; }
 

@@ -106,6 +106,7 @@
     <Compile Include="Helpers\SessionStorage.cs" />
     <Compile Include="Infrastructure\AuthorizedToRolesAttribute.cs" />
     <Compile Include="Infrastructure\Md5Helper.cs" />
+    <Compile Include="Infrastructure\Security.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Helpers\ControllerExtension.cs" />
     <Compile Include="Models\MeetingsListViewModel.cs" />
@@ -125,7 +126,6 @@
     <Content Include="Views\Account\List.aspx" />
     <Content Include="Views\Shared\AccessError.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
-    <Content Include="Views\Meeting\List.aspx" />
     <Content Include="Views\Projects\AddStaff.aspx" />
     <Content Include="Views\Projects\Create.aspx" />
     <Content Include="Views\Projects\Delete.aspx" />

@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<IEnumerable<NProject.Models.Domain.User>>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<IEnumerable<NProject.Models.Domain.TeamMate>>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
 	Team
@@ -26,9 +26,6 @@
             <th>
                 Role
             </th>
-             <th>
-                State
-            </th>
         </tr>
 
     <% foreach (var item in Model) { %>
@@ -43,16 +40,13 @@
             <%
 }%>
             <td>
-                <%: item.Username %>
+                <%: item.User.Name %>
             </td>
             <td>
-                <%: item.Email %>
+                <%: item.User.Email %>
             </td>
             <td>
                 <%: item.Role %>
-            </td>
-            <td>
-                <%: item.UserState %>
             </td>
         </tr>
     

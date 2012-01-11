@@ -68,7 +68,7 @@
                 <%: String.Format("{0:g}", item.EndDate) %>
             </td>
             <td>
-                <%: item.Responsible.Username %>
+                <%: item.Responsible.Name %>
             </td>
             <td>
                 <%: item.Status %>

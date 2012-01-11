@@ -64,12 +64,12 @@ namespace NProject.Models
         /// <param name="username">The user name for the new user. </param><param name="password">The password for the new user. </param><param name="email">The e-mail address for the new user.</param><param name="passwordQuestion">The password question for the new user.</param><param name="passwordAnswer">The password answer for the new user</param><param name="isApproved">Whether or not the new user is approved to be validated.</param><param name="providerUserKey">The unique identifier from the membership data source for the user.</param><param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"/> enumeration value indicating whether the user was created successfully.</param>
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            if (AccessPoint.Users.Any(u => u.Username == username))
+            if (AccessPoint.Users.Any(u => u.Name == username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
                 return null;
             }
-            AccessPoint.Users.Add(new User {Username = username, Email = email, Hash = MD5.EncryptMD5(password)});
+            AccessPoint.Users.Add(new User {Name = username, Email = email, Hash = MD5.EncryptMD5(password)});
             AccessPoint.SaveChanges();
             status = MembershipCreateStatus.Success;
             return null;
@@ -143,11 +143,11 @@ namespace NProject.Models
         public override bool ValidateUser(string username, string password)
         {
             string hash = MD5.EncryptMD5(password);
-            var user = AccessPoint.Users.SingleOrDefault(u => u.Username == username && u.Hash == hash);
+            var user = AccessPoint.Users.SingleOrDefault(u => u.Name == username && u.Hash == hash);
             if (user != null)
             {
                 SessionStorage.User.Id = user.Id;
-                SessionStorage.User.Role = user.Role;
+               // SessionStorage.User.Role = user.Role;
                 return true;
             }
             else
@@ -232,7 +232,7 @@ namespace NProject.Models
             totalRecords = AccessPoint.Users.Count();
             // becouse on firstpage must be first 20 users and so on..
             pageIndex = pageIndex - 1;
-            return AccessPoint.Users.OrderBy(u => u.Role).Skip(pageIndex*pageSize).Take(pageSize).ToList();
+            return AccessPoint.Users.ToList();
         }
 
         /// <summary>

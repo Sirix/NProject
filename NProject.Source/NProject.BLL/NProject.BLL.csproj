@@ -53,8 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseService.cs" />
+    <Compile Include="CompanyService.cs" />
     <Compile Include="Md5Helper.cs" />
-    <Compile Include="ProjectsManager.cs" />
+    <Compile Include="ProjectService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaskService.cs" />
     <Compile Include="UserService.cs" />

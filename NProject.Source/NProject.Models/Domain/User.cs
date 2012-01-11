@@ -14,47 +14,61 @@ namespace NProject.Models.Domain
         TopManager = 8,
         Customer = 16,
         Tester = 32,
-        Admin = 64
+        All = Programmer | Manager | TopManager | Customer | Tester
     }
+
     public class User
     {
         public int Id { get; set; }
+
         [Required]
-        public string Username { get; set; }
+        public string Name { get; set; }
+
         public string Hash { get; set; }
+
         [Required]
         public string Email { get; set; }
-        public double HouseRate { get; set; }
 
-        [NotMapped]
-        public UserState UserState
-        {
-            get { return (UserState) state; }
-            set { state = (byte) value; }
-        }
+        //public double HouseRate { get; set; }
 
-        [Obsolete("This property is used only by EF. Use UserState property instead.")]
-        public int state;
+        //[NotMapped]
+        //public UserState UserState
+        //{
+        //    get { return (UserState) state; }
+        //    set { state = (byte) value; }
+        //}
 
-        [NotMapped]
-        public UserRole Role
-        {
-#pragma warning disable 612,618
-            get { return (UserRole)role; }
-            set { role = (byte)value; }
-#pragma warning restore 612,618
-        }
+        //[Obsolete("This property is used only by EF. Use UserState property instead.")] 
+        //public int state;
 
-        [Obsolete("This property is used only by EF. Use Role property instead.")]
-        [Column("Role")]
-        public int role { get; set; }
+//        [NotMapped]
+//        public UserRole Role
+//        {
+//#pragma warning disable 612,618
+//            get { return (UserRole) role; }
+//            set { role = (byte) value; }
+//#pragma warning restore 612,618
+//        }
 
-        public virtual ICollection<Project> Projects { get; set; }
+//        [Obsolete("This property is used only by EF. Use Role property instead.")]
+//        [Column("Role")]
+//        public virtual int role { get; set; }
+
+        public virtual bool Administrator { get; set; }
+        public virtual DateTime RegistrationDate { get; private set; }
+
+      //  public virtual int CompanyId { get; set; }
+        public virtual Company Company { get; set; }
+        /// <summary>
+        /// A collection of all projects and roles for them
+        /// </summary>
+        public virtual ICollection<TeamMate> Works { get; set; }
         public virtual ICollection<Meeting> Meetings { get; set; }
 
         public User()
         {
-            UserState = UserState.Working;
+           // UserState = UserState.Working;
+            RegistrationDate = DateTime.UtcNow;
         }
     }
 }

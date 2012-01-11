@@ -28,8 +28,6 @@ namespace NProject.BLL
                     break;
                 case UserRole.Tester:
                     break;
-                case UserRole.Admin:
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException("role");
             }
@@ -48,7 +46,11 @@ namespace NProject.BLL
         public User GetUser(string username, string password)
         {
             string hash = MD5.EncryptMD5(password);
-            return Database.Users.FirstOrDefault(u => u.Username == username && u.Hash == hash);
+            return Database.Users.FirstOrDefault(u => u.Name == username && u.Hash == hash);
+        }
+        public UserRole GetUserRoleInProject(User user, Project p)
+        {
+            return user.Works.FirstOrDefault(t => t.Project == p).Role;
         }
     }
 }

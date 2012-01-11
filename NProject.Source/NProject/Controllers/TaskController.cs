@@ -48,7 +48,7 @@ namespace NProject.Controllers
             var tasks = TaskService.GetTasksForProject(id);
             var vm = new TaskListViewModel {Tasks = tasks};
 
-            var project = (new ProjectsRepository()).GetProjectById(id);
+            var project = (new ProjectService()).GetProjectById(id);
             //ValidateAccessToProject(project, "PM", "You're not eligible to view tasks of this project.");
 
             ViewData["ProjectId"] = id;
@@ -65,7 +65,7 @@ namespace NProject.Controllers
         /// <param name="id">Project id</param>
         private ActionResult ValidateAccessToProject(int id)
         {
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var user = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
             _project = AccessPoint.Projects.FirstOrDefault(p => p.Id == id);
 
             if (_project == null)
@@ -75,7 +75,7 @@ namespace NProject.Controllers
                 return RedirectToAction("List", "Projects");
             }
 
-            if (!_project.Team.Contains(user))
+            if (!_project.Team.Select(t => t.User).Contains(user))
             {
                 TempData["ErrorMessage"] = "You're not eligible to manage tasks of this project.";
                 //RedirectToAction("List", "Projects").ExecuteResult(ControllerContext);
@@ -104,18 +104,18 @@ namespace NProject.Controllers
                 //    ToList();
 
             model.Programmers =
-                project.Team.Where(u => u.Role == UserRole.Programmer && u.UserState == UserState.Working).Select(
+                project.Team.Where(u => u.Role == UserRole.Programmer).Select(
                     u =>
                     new SelectListItem
                         {
-                            Text = u.Username,
-                            Value = u.Id.ToString(),
+                            Text = u.User.Name,
+                            Value = u.User.Id.ToString(),
                         });
 
             return model;
         }
 
-        [AuthorizedToRoles(UserRole.Manager)]
+        [AuthorizedToRoles]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult AddToProject(TaskFormViewModel model)
@@ -154,7 +154,7 @@ namespace NProject.Controllers
 
             AccessPoint.SaveChanges();
             TempData["InformMessage"] = "Task created.";
-            return RedirectToAction("Tasks", "Projects", new {id = t.Project.Id});
+            return RedirectToAction("AtProject", "Task", new {id = t.Project.Id});
         }
         //
         // GET: /Task/Edit/5
@@ -162,7 +162,7 @@ namespace NProject.Controllers
         [AuthorizedToRoles(UserRole.Manager)]
         public ActionResult Edit(int id)
         {
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var user = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
             var task = AccessPoint.Tasks.FirstOrDefault(i => i.Id == id);
             if (task == null)
             {
@@ -170,10 +170,10 @@ namespace NProject.Controllers
                 return RedirectToAction("List", "Projects");
             }
             //if this is a pm of a project
-            if (!task.Project.Team.Contains(user))
+            if (!task.Project.Team.Select(t => t.User).Contains(user))
             {
                 TempData["ErrorMessage"] = "You're not eligible to modify this task.";
-                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+                return RedirectToAction("AtProject", "Task", new {id = task.Project.Id});
             }
             var model = GetTaskFormViewModel(task.Project.Id);
             model.Task = task;
@@ -193,7 +193,7 @@ namespace NProject.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+                var user = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
                 var task = AccessPoint.Tasks.First(i => i.Id == model.Task.Id);
                 if (task == null)
                 {
@@ -201,17 +201,17 @@ namespace NProject.Controllers
                     return RedirectToAction("List", "Projects");
                 }
                 //if current user not a pm of the project
-                if (!task.Project.Team.Contains(user))
+                if (!task.Project.Team.Any(t => t.User.Id == user.Id))
                 {
                     TempData["ErrorMessage"] = "You're not eligible to edit this task.";
-                    return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
+                    return RedirectToAction("AtProject", "Task", new {id = task.Project.Id});
                 }
                 //check for a new responsible user
                 var respUser = AccessPoint.Users.FirstOrDefault(i => i.Id == model.ResponsibleUserId);
-                if (respUser == null || !task.Project.Team.Contains(respUser))
+                if (respUser == null || !task.Project.Team.Any(t => t.User.Id == respUser.Id))
                 {
                     TempData["ErrorMessage"] = "Selected responsible user is not in this project's team.";
-                    return RedirectToAction("Tasks", "Projects", new { id = task.Project.Id });
+                    return RedirectToAction("AtProject", "Task", new { id = task.Project.Id });
                 }
 
                 AccessPoint.ObjectContext.ApplyCurrentValues("Tasks", model.Task);
@@ -221,7 +221,7 @@ namespace NProject.Controllers
                 AccessPoint.SaveChanges();
 
                 TempData["InformMessage"] = "Task has been updated.";
-                return RedirectToAction("Tasks", "Projects", new {id = task.Project.Id});
+                return RedirectToAction("AtProject", "Task", new { id = task.Project.Id });
             }
             else
             {
@@ -268,7 +268,7 @@ namespace NProject.Controllers
         [AuthorizedToRoles(UserRole.Programmer)]
         public ActionResult Take(int id)
         {
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var user = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
             var task = AccessPoint.Tasks.First(t => t.Id == id);
             //check for user is responsible for this task
             if (task.Responsible.Id != user.Id)
@@ -326,7 +326,7 @@ namespace NProject.Controllers
 
         private void CheckConditionsForCompleteTask(int taskId)
         {
-            var user = AccessPoint.Users.First(u => u.Username == User.Identity.Name);
+            var user = AccessPoint.Users.First(u => u.Name == User.Identity.Name);
             var task = AccessPoint.Tasks.First(t => t.Id == taskId);
             //check for user is responsible for this task
             if (task.Responsible.Id != user.Id)

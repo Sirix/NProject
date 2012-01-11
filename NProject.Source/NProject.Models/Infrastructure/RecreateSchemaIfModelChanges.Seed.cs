@@ -19,72 +19,68 @@ namespace NProject.Models.Infrastructure
         {
             context.Users.Add(new User
             {
-                Username = "Director",
+                Name = "Director",
                 Email = "director@nproject.com",
                 Hash = EncryptMD5("director"),
-                Role = UserRole.TopManager
             });
-            var m1 = new User
+            var manager = new User
             {
-                Username = "Manager",
+                Name = "Manager",
                 Email = "manager@nproject.com",
                 Hash = EncryptMD5("manager"),
-                Role = UserRole.Manager
             };
             var m2 = new User
             {
-                Username = "Stiv",
+                Name = "Stiv",
                 Email = "veryCoolPM@Stiv.com",
                 Hash = EncryptMD5("Stiv"),
-                Role = UserRole.Manager
             };
             var p1 = new User
             {
-                Username = "Mark",
+                Name = "Mark",
                 Email = "coolProgrammer@nproject.com",
                 Hash = EncryptMD5("Mark"),
-                Role = UserRole.Programmer
             };
             var customer = new User
             {
-                Username = "Customer",
+                Name = "Customer",
                 Email = "Customer@nproject.com",
                 Hash = EncryptMD5("customer"),
-                Role = UserRole.Customer
             };
 
             context.Users.Add(new User
             {
-                Username = "Programmer",
+                Name = "Programmer",
                 Email = "programmer@nproject.com",
                 Hash = EncryptMD5("programmer"),
-                Role = UserRole.Programmer
             });
 
             context.Users.Add(new User
             {
-                Username = "Programmer2",
+                Name = "Programmer2",
                 Email = "programmer2@nproject.com",
                 Hash = EncryptMD5("programmer2"),
-                Role = UserRole.Programmer
             });
 
             context.Users.Add(customer);
             context.Users.Add(p1);
-            context.Users.Add(m1);
+            context.Users.Add(manager);
             context.Users.Add(m2);
             // context.SaveChanges();
 
+            var company = new Company() {Name = "Test-company"};
+            manager.Company = company;
+            context.Companies.Add(company);
+
             var project1 = new Project
-            {
-                Name = "Develop a project management system",
-                Customer = customer,
-                CreationDate = DateTime.Now,
-                StartDate = DateTime.Now,
-                DeliveryDate = DateTime.Now.AddDays(1),
-                Status = context.ProjectStatuses.First(),
-                Team = new List<User> { m2 }
-            };
+                               {
+                                   Name = "Develop a project management system",
+                                   Customer = customer,
+                                   StartDate = DateTime.Now,
+                                   DeliveryDate = DateTime.Now.AddDays(1),
+                                   Status = context.ProjectStatuses.First(),
+                                   Team = new List<TeamMate> {new TeamMate() {Role = UserRole.Manager, User = manager}}
+                               };
 
 
             context.Projects.Add(project1);
@@ -103,11 +99,11 @@ namespace NProject.Models.Infrastructure
             {
                 Name = "Create a 3D game",
                 Customer = customer,
-                CreationDate = DateTime.Now,
+                
                 StartDate = DateTime.Now,
                 DeliveryDate = DateTime.Now.AddDays(1),
                 Status = context.ProjectStatuses.First(),
-                Team = new List<User> { m1, p1 },
+                Team = new List<TeamMate> {new TeamMate() {Role = UserRole.Programmer, User = p1}},
                 Tasks =
                     new List<Task> { task1 }
             });
@@ -132,12 +128,12 @@ namespace NProject.Models.Infrastructure
             context.ProjectStatuses.Add(new ProjectStatus { Name = "Finished", Id = 4 }.AsBase());
 
             context.Users.Add(new User
-            {
-                Username = "admin",
-                Email = "admin@nproject.com",
-                Hash = EncryptMD5("admin"),
-                Role = UserRole.Admin
-            });
+                                  {
+                                      Name = "admin",
+                                      Email = "admin@nproject.com",
+                                      Hash = EncryptMD5("admin"),
+                                      Administrator = true
+                                  });
 
             context.SaveChanges();
         }

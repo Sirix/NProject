@@ -61,11 +61,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Company.cs" />
     <Compile Include="Domain\Meeting.cs" />
     <Compile Include="Domain\Project.cs" />
     <Compile Include="Domain\Role.cs" />
     <Compile Include="Domain\ProjectStatus.cs" />
     <Compile Include="Domain\Task.cs" />
+    <Compile Include="Domain\TeamMate.cs" />
     <Compile Include="Domain\User.cs" />
     <Compile Include="Infrastructure\DataComparisonAttribute.cs" />
     <Compile Include="Infrastructure\IAccessPoint.cs" />

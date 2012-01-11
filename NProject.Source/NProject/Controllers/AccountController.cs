@@ -61,17 +61,17 @@ namespace NProject.Controllers
                 if (user != null)
                 {
                     FormsService.SignIn(model.UserName, model.RememberMe);
-                    SessionStorage.User = new UserSessionInfo {Id = user.Id, Role = user.Role};
+                    SessionStorage.User = new UserSessionInfo {Id = user.Id /*, Role = user.Role*/};
 
                     if (!String.IsNullOrEmpty(returnUrl))
                     {
                         return Redirect(returnUrl);
                     }
-                    else
-                    {
-                        var loc = UserService.GetDefaultLocationForRole(user.Role).Split('/');
-                        return RedirectToAction(loc[1], loc[0]);
-                    }
+                    //else
+                    //{
+                    //    var loc = UserService.GetDefaultLocationForRole(user.Role).Split('/');
+                    //    return RedirectToAction(loc[1], loc[0]);
+                    //}
                 }
                 else
                 {
@@ -98,7 +98,6 @@ namespace NProject.Controllers
         // URL: /Account/Register
         // **************************************
 
-        [Authorize(Roles = "admin")]
         public ActionResult Register()
         {
             ViewData["PasswordLength"] = MembershipService.MinPasswordLength;
@@ -109,7 +108,6 @@ namespace NProject.Controllers
             return View();
         }
 
-        [Authorize(Roles = "admin")]
         [HttpPost]
         public ActionResult Register(RegisterModel model)
         {
@@ -203,10 +201,10 @@ namespace NProject.Controllers
             else
             {
                 var user = MembershipService.GetUserById(id);
-                var roles = UIHelper.CreateSelectListFromEnum<UserRole>(user.Role);
+                var roles = UIHelper.CreateSelectListFromEnum<UserRole>();
 
                 ViewData["Roles"] = roles;
-                ViewData["Username"] = user.Username;
+                ViewData["Username"] = user.Name;
 
                 //save user state enum to list
                 var values = Enum.GetValues(typeof (UserState));
@@ -216,7 +214,7 @@ namespace NProject.Controllers
                 foreach (byte v in values)
                 {
                     result.Add(new SelectListItem
-                                   {Text = names[i++], Value = v.ToString(), Selected = v == (byte) user.UserState});
+                                   {Text = names[i++], Value = v.ToString()});
 
                 }
                 ViewData["UserStates"] = result;
@@ -242,7 +240,7 @@ namespace NProject.Controllers
                 }
             }
             var user = MembershipService.GetUserById(id);
-            var roles = UIHelper.CreateSelectListFromEnum(user.Role);
+            var roles = UIHelper.CreateSelectListFromEnum<UserRole>();
             ViewData["Roles"] = roles;
             //save user state enum to list
             var values = Enum.GetValues(typeof(UserState));
@@ -251,11 +249,11 @@ namespace NProject.Controllers
             var result = new List<SelectListItem>();
             foreach (byte v in values)
             {
-                result.Add(new SelectListItem { Text = names[i++], Value = v.ToString(), Selected = v == (byte)user.UserState });
+                result.Add(new SelectListItem { Text = names[i++], Value = v.ToString() });
 
             }
             ViewData["UserStates"] = result;
-            ViewData["Username"] = user.Username;
+            ViewData["Username"] = user.Name;
             return View();
         }
     }

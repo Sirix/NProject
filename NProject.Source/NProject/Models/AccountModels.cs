@@ -145,8 +145,8 @@ namespace NProject.Models
             if (status != MembershipCreateStatus.Success) return status;
 
             //set role
-            var user = AccessPoint.Users.First(u => u.Username == userName);
-            user.Role = role;
+            var user = AccessPoint.Users.First(u => u.Name == userName);
+           // user.Role = role;
             AccessPoint.SaveChanges();
 
             return status;
@@ -191,15 +191,15 @@ namespace NProject.Models
             var user = AccessPoint.Users.First(u => u.Id == id);
 
 
-            var currentUserRoleId = user.Role;
+            //var currentUserRoleId = user.Role;
 
-            //only one user remains with this role
-            if (AccessPoint.Users.Count(u => u.Role == currentUserRoleId) == 1)
+          //  //only one user remains with this role
+//if (AccessPoint.Users.Count(u => u.Role == currentUserRoleId) == 1)
             {
-                return false;
+          //      return false;
             }
-            user.Role = roleId;
-            user.UserState = (UserState) stateId;
+         //   user.Role = roleId;
+           // user.UserState = (UserState) stateId;
 
             AccessPoint.SaveChanges();
 

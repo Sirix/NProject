@@ -16,6 +16,7 @@ using NProject.BLL;
 using NProject.Models;
 using NProject.Models.Domain;
 using NProject.Models.Infrastructure;
+using NProject.ViewModels.Account;
 
 namespace NProject.Controllers
 {
@@ -255,6 +256,21 @@ namespace NProject.Controllers
             ViewData["UserStates"] = result;
             ViewData["Username"] = user.Name;
             return View();
+        }
+
+        public ActionResult SimpleRegistration(string email)
+        {
+            //TODO: send an e-mail
+
+            return View(new SimpleRegistration {Email = email});
+        }
+
+        public ActionResult SimpleRegistrationFinish(SimpleRegistration model)
+        {
+            if (!ModelState.IsValid)
+                return View("SimpleRegistration", model);
+            else
+                return Content("Thanks!");
         }
     }
 }

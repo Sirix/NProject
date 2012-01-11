@@ -110,6 +110,7 @@
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Helpers\ControllerExtension.cs" />
     <Compile Include="Models\MeetingsListViewModel.cs" />
+    <Compile Include="ViewModels\Account\SimpleRegistration.cs" />
     <Compile Include="ViewModels\ProjectListViewModel.cs" />
     <Compile Include="Models\TaskFormViewModel.cs" />
     <Compile Include="Models\EFMembershipService.cs" />
@@ -124,6 +125,7 @@
     <Content Include="Global.asax" />
     <Content Include="Views\Account\Edit.aspx" />
     <Content Include="Views\Account\List.aspx" />
+    <Content Include="Views\Account\SimpleRegistration.aspx" />
     <Content Include="Views\Shared\AccessError.aspx" />
     <Content Include="Views\Error\Http404.aspx" />
     <Content Include="Views\Projects\AddStaff.aspx" />

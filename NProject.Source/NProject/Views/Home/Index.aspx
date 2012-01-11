@@ -1,12 +1,16 @@
 ﻿<%@ Page Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
-    Home Page
+    NProject
 </asp:Content>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
-    <h2><%: ViewData["Message"] %></h2>
-    <p>
-        To learn more about ASP.NET MVC visit <a href="http://asp.net/mvc" title="ASP.NET MVC Website">http://asp.net/mvc</a>.
-    </p>
+   <h1>Hello to NProject</h1>
+   Start use NProject right now!
+   <% using (Html.BeginForm("SimpleRegistration", "Account"))
+      {%>
+    <%:Html.AntiForgeryToken()%>
+    E-mail: <%:Html.TextBox("Email")%>
+    <input type="submit" value="Register!" />
+   <% }%>
 </asp:Content>

@@ -53,6 +53,8 @@ namespace NProject.Models.Domain
 //        [Obsolete("This property is used only by EF. Use Role property instead.")]
 //        [Column("Role")]
 //        public virtual int role { get; set; }
+        //We store a timeshift value for each user
+        public virtual byte TimeShiftFromUtc { get; set; }
 
         public virtual bool Administrator { get; set; }
         public virtual DateTime RegistrationDate { get; private set; }
